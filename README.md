@@ -28,3 +28,9 @@
 22  https://github.com/it-incubator/nestjs/tree/main/examples/nestjs/typeorm-postgresql-wallets-query-builder
 23  https://github.com/it-incubator/ed-back-lessons-typeorm
 24  null
+
+
+TODO:
+
+1. DatabaseConfig
+2. Create DB in PostgreSQL

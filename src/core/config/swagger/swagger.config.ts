@@ -1,19 +1,17 @@
-import { INestApplication } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { INestApplication } from "@nestjs/common";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
-export function swaggerConfig(app: INestApplication): void{
- const config = new DocumentBuilder()
-    .setTitle('Quiz game')
-    .setDescription('The game description')
-    .setVersion('1.0')
-    .addTag('PairQuizGame')
+export function swaggerConfig(app: INestApplication): void {
+  const config = new DocumentBuilder()
+    .setTitle("Quiz game")
+    .setDescription("The game description")
+    .setVersion("1.0")
+    .addTag("PairQuizGame")
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup("api", app, documentFactory);
 }
-
-
 
 // import swaggerJsdoc from 'swagger-jsdoc';
 // import swaggerUi from 'swagger-ui-express';
