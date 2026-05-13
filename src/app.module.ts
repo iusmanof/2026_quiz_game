@@ -1,27 +1,51 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import DatabaseConfiguration, {
-  DatabaseConfig,
-} from "src/core/config/database/database.config.ts";
+import { ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import DynamicConfigeModule from "./dynamic-config.module.ts";
+import DynamicEnvConfigureModule from "./dynamic-config.module";
 
 @Module({
   imports: [
-    DynamicConfigeModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [DatabaseConfiguration],
-    }),
+    // TODO
+    // ConfigModule.forRoot({
+    //     isGlobal: true,
+    //     load: [databaseConf],
+    // }),
+    // TypeOrmModule.forRootAsync({
+    //     useFactory(config: ConfigService<DatabaseConfig>) {
+    //         return config.get('database', {
+    //             infer: true,
+    //         });
+    //     },
+    //     inject: [ConfigService],
+    // }),
+    DynamicEnvConfigureModule,
     TypeOrmModule.forRootAsync({
-      useFactory(config: ConfigService<DatabaseConfig>) {
-        return config.get("database", { infer: true });
+      inject: [ConfigService],
+
+      useFactory: (configService: ConfigService) => {
+        const host = configService.get<string>("DB_HOST");
+        const port = configService.get<string>("DB_PORT");
+        const user = configService.get<string>("DB_USER");
+        const db = configService.get<string>("DB_NAME");
+        console.log(
+          `🟢 [TYPEORM] DB connected | host=${host} | port=${port} | user=${user} | db=${db}`,
+        );
+        return {
+          type: "postgres",
+
+          host,
+          port: Number(port),
+
+          username: configService.getOrThrow<string>("DB_USER"),
+          password: configService.getOrThrow<string>("DB_PASSWORD"),
+          database: configService.getOrThrow<string>("DB_NAME"),
+
+          autoLoadEntities: true,
+
+          synchronize: true,
+        };
       },
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

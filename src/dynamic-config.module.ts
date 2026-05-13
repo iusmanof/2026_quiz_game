@@ -2,14 +2,14 @@ import { join } from "path";
 import { ConfigModule } from "@nestjs/config";
 
 const envFilePaths = [
-  process.env.ENV_FILE_PATH?.trim() || "",
-  join(__dirname, `env`, `.env.${process.env.ENV_NODE_ENV}.local`),
-  // TODO env
+  join(process.cwd(), "src", "env", `.env.${process.env.NODE_ENV}.local`),
+  join(process.cwd(), "src", "env", `.env.${process.env.NODE_ENV}`),
+  join(process.cwd(), "src", "env", `.env.production`),
 ];
 
-const DynamicConfigeModule = ConfigModule.forRoot({
+const DynamicEnvConfigureModule = ConfigModule.forRoot({
   envFilePath: envFilePaths,
   isGlobal: true,
 });
 
-export default DynamicConfigeModule;
+export default DynamicEnvConfigureModule;

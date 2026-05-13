@@ -33,4 +33,11 @@
 TODO:
 
 1. DatabaseConfig
-2. Create DB in PostgreSQL
+2. Create DB in PostgresSQL
+3. pnpm i typeorm
+4. pnpm i @nestjs/config
+5. add env files
+6. dynamic config module
+7. pnpm i pg
+8. pnpm install @nestjs/config @nestjs/typeorm typeorm pg
+9. for Windows pnpm install cross-env
