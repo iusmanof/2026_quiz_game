@@ -41,3 +41,112 @@ TODO:
 7. pnpm i pg
 8. pnpm install @nestjs/config @nestjs/typeorm typeorm pg
 9. for Windows pnpm install cross-env
+10. pnpm install class-validator class-transformer
+11. config-validation.utility.ts
+12. architecture folder
+13. pnpm install @nestjs/cqrs
+
+
+src/
+├── main.ts
+├── app.module.ts
+│
+├── core/                         # global infrastructure
+│   ├── config/
+│   ├── database/
+│   ├── guards/
+│   ├── interceptors/
+│   ├── filters/
+│   ├── decorators/
+│   ├── logger/
+│   ├── exceptions/
+│   └── constants/
+│
+├── modules/
+│   └── auth/
+│       ├── account.module.ts
+│       │
+│       ├── api/                 # transport layer
+│       │   ├── controllers/
+│       │   │   └── auth.controller.ts
+│       │   │
+│       │   ├── dto/
+│       │   │   ├── login.dto.ts
+│       │   │   ├── register.dto.ts
+│       │   │   └── refresh-token.dto.ts
+│       │   │
+│       │   └── presenters/
+│       │
+│       ├── application/         # CQRS layer
+│       │   ├── commands/
+│       │   │   ├── handlers/
+│       │   │   │   ├── login.handler.ts
+│       │   │   │   ├── register.handler.ts
+│       │   │   │   └── refresh-token.handler.ts
+│       │   │   │
+│       │   │   ├── impl/
+│       │   │   │   ├── login.command.ts
+│       │   │   │   ├── register.command.ts
+│       │   │   │   └── refresh-token.command.ts
+│       │   │
+│       │   ├── queries/
+│       │   │   ├── handlers/
+│       │   │   └── impl/
+│       │   │
+│       │   ├── events/
+│       │   │   ├── handlers/
+│       │   │   └── impl/
+│       │   │
+│       │   ├── services/
+│       │   │   ├── password-hasher.service.ts
+│       │   │   ├── jwt-token.service.ts
+│       │   │   └── auth-policy.service.ts
+│       │   │
+│       │   └── sagas/
+│       │
+│       ├── domain/              # pure business rules
+│       │   ├── entities/
+│       │   │   └── user.entity.ts
+│       │   │
+│       │   ├── value-objects/
+│       │   │   ├── email.vo.ts
+│       │   │   └── password.vo.ts
+│       │   │
+│       │   ├── repositories/
+│       │   │   └── user.repository.interface.ts
+│       │   │
+│       │   ├── services/
+│       │   ├── events/
+│       │   ├── exceptions/
+│       │   └── enums/
+│       │
+│       ├── infrastructure/      # external implementations
+│       │   ├── persistence/
+│       │   │   ├── entities/
+│       │   │   │   └── user.orm-entity.ts
+│       │   │   │
+│       │   │   ├── repositories/
+│       │   │   │   └── user.repository.ts
+│       │   │   │
+│       │   │   └── migrations/
+│       │   │
+│       │   ├── adapters/
+│       │   │   ├── bcrypt.adapter.ts
+│       │   │   ├── jwt.adapter.ts
+│       │   │   └── mailer.adapter.ts
+│       │   │
+│       │   └── strategies/
+│       │       ├── jwt.strategy.ts
+│       │       └── local.strategy.ts
+│       │
+│       └── tests/
+│           ├── unit/
+│           ├── integration/
+│           └── e2e/
+│
+└── shared/                      # reusable cross-module utilities
+├── dto/
+├── utils/
+├── types/
+├── helpers/
+└── abstractions/

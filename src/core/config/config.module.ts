@@ -1,8 +1,10 @@
 import { ConfigModule } from "@nestjs/config";
 import { join } from "path";
-import databaseConf from "./database/database.config";
-import { Module } from "@nestjs/common";
+import databaseConf from "../database/database.config";
+import { Global, Module } from "@nestjs/common";
+import { CoreConfig } from "./core.config";
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,5 +17,7 @@ import { Module } from "@nestjs/common";
       load: [databaseConf],
     }),
   ],
+  providers: [CoreConfig],
+  exports: [CoreConfig],
 })
 export class AppConfigModule {}

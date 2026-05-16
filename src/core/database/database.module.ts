@@ -16,6 +16,7 @@ import { Module } from "@nestjs/common";
         console.log(
           `🟢host=${db.host}:${db.port} database_name=${db.database}`,
         );
+        console.log(`⏳ app port: ${process.env.PORT}`);
         return db;
       },
     }),
