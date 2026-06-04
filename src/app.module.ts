@@ -1,17 +1,23 @@
-import { Module } from "@nestjs/common";
-import { AppConfigModule } from "./core/config/config.module";
-import { DatabaseModule } from "./core/database/database.module";
-import { AccountModule } from "./modules/account/account.module";
-import { PairGameModule } from "./modules/pair-game/pair_game.module";
-import { DbClearModule } from "./modules/db-clear/db-clear.module";
+import { Module } from '@nestjs/common';
+import { configModule } from './config-module';
+import { UserAccountsModule } from '@user-accounts/user-accounts.module';
+import { CoreConfig } from '@core/core.config';
+import { BloggersPlatformModule } from '@modules/bloggers-platform/bloggers-platform.module';
+import { PostgresqlDatabaseModule } from '@core/database/postgresql-database.module';
+import { DeleteAllDataModule } from '@modules/delete-all-data/delete-all-data.module';
 
 @Module({
   imports: [
-    AppConfigModule,
-    DatabaseModule,
-    AccountModule,
-    PairGameModule,
-    DbClearModule,
+    configModule,
+    PostgresqlDatabaseModule,
+    // CoreModule,
+    UserAccountsModule,
+    BloggersPlatformModule,
+    DeleteAllDataModule,
+    // GlobalThrottlerModule,
   ],
+  controllers: [],
+  providers: [CoreConfig],
+  exports: [CoreConfig],
 })
 export class AppModule {}

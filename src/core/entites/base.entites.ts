@@ -1,1 +1,0 @@
-// TODO write entity base class

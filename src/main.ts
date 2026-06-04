@@ -1,37 +1,29 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
-import { swaggerConfig } from "./core/swagger/swagger.config";
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import cookieParser from 'cookie-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { CoreConfig } from '@core/core.config';
+import { appSetup } from './setup/app.setup';
+// import { DomainExceptionFilter } from './setup/http-filter.setup';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.use(cookieParser());
+  // app.set('trust proxy', true);
+  // app.setGlobalPrefix('sa');
 
-  swaggerConfig(app);
+  // app.useGlobalFilters(new DomainExceptionFilter());
 
-  await app.listen(process.env.PORT ?? 3000);
+  appSetup(app);
+
+  const coreConfig = app.get<CoreConfig>(CoreConfig);
+  const port = coreConfig.getPort();
+  const env = coreConfig.getEnv();
+
+  await app.listen(port);
+  console.log(`🚀 App running on PORT ${port}`);
+  console.log(`📦 NODE_ENV: ${env}`);
+  console.log('🔥 Server started...');
 }
-bootstrap();
 
-// https://github.com/it-incubator/nestjs/blob/main/examples/nestjs/typeorm-postgresql-wallets-entity-repository/src/main.ts
-
-// import { NestFactory } from '@nestjs/core';
-// import { appSetup } from './setup/app.setup';
-// import { CoreConfig } from '@core/core.config';
-// import { initAppModule } from './init-app-module';
-//
-// async function bootstrap() {
-//     const DynamicAppModule = await initAppModule();
-//     // создаём на основе донастроенного модуля наше приложение
-//     const app = await NestFactory.create(DynamicAppModule);
-//
-//     const coreConfig = app.get<CoreConfig>(CoreConfig);
-//
-//     appSetup(app, coreConfig.isSwaggerEnabled); //глобальные настройки приложения
-//
-//     const port = coreConfig.port;
-//
-//     await app.listen(port, () => {
-//         console.log('App starting listen port: ', port);
-//         console.log('NODE_ENV: ', coreConfig.env);
-//     });
-// }
-// bootstrap();
+void bootstrap();
