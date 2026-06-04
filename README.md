@@ -21,9 +21,7 @@
 15  https://github.com/it-incubator/ed-back-lessons-bloggers-nest/tree/lesson-3-usecases-cqrs
 16  https://github.com/it-incubator/ed-back-lessons-bloggers-nest/tree/lesson-4-env-scopes
 17  null
-18  null
-19  null
-20  null
+----
 21  null
 22  https://github.com/it-incubator/nestjs/tree/main/examples/nestjs/typeorm-postgresql-wallets-query-builder
 23  https://github.com/it-incubator/ed-back-lessons-typeorm
