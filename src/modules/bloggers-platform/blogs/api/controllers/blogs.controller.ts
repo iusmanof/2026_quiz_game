@@ -3,14 +3,12 @@ import {
   Controller,
   Delete,
   Get,
-  // Get,
   HttpCode,
   HttpStatus,
   Param,
   Post,
   Put,
   Query,
-  // Query,
   UseGuards,
 } from '@nestjs/common';
 import { CreateBlogDto } from '../dto/create-blog.dto';
@@ -51,7 +49,7 @@ class BlogsController {
   }
 
   @Put(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)  
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(@Param('id') id: string, @Body() dto: UpdateBlogDto): Promise<void> {
     return this.commandBus.execute<UpdateBlogCommand, void>(new UpdateBlogCommand(id, dto));
   }
