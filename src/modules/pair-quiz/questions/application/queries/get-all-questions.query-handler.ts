@@ -19,7 +19,6 @@ export class GetAllQuestionsQueryHandler implements IQueryHandler<GetAllQuestion
 
   async execute(query: GetAllQuestionsQuery): Promise<PaginatedViewDto<QuestionViewDto>> {
     const result = await this.questionsQueryRepository.getAll(query.queryParams);
-    console.log(result);
     return {
       ...result,
       items: result.items.map((item) => QuestionViewDto.mapToView(item)),
