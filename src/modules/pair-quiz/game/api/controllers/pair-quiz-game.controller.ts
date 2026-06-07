@@ -1,5 +1,12 @@
-import { Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { GetTopUsersQuery } from '../../application/queries/get-top-users.query-handler';
+import { GetCurrentGamesQuery } from '../../application/queries/get-current-games.query-handler';
+import { GetCurrentUserStatisticQuery } from '../../application/queries/get-current-user-statistic.query-handler';
+import { GetCurrentUnfinishedUserGameQuery } from '../../application/queries/get-current-unfinished-user-game.query-handler';
+import { GetGameByIdQuery } from '../../application/queries/get-game-by-id.query-handler';
+import { ConnectCurrentUserCommand } from '../../application/commands/connect-current-user.command-handler';
+import { SendAnswerForNextCommand } from '../../application/commands/send-answer-for-next.command-handler';
 
 @Controller('pair-game-quiz')
 class PairGameQuizController {
@@ -10,31 +17,45 @@ class PairGameQuizController {
 
   @Get('users/top')
   @HttpCode(HttpStatus.OK)
-  getTopUsers() {}
+  async getTopUsers() {
+    return this.queryBus.execute(new GetTopUsersQuery());
+  }
 
   @Get('pairs/my')
   @HttpCode(HttpStatus.OK)
-  getCurrentGames() {}
+  async getCurrentGames() {
+    return this.queryBus.execute(new GetCurrentGamesQuery());
+  }
 
   @Get('users/my-statistic')
   @HttpCode(HttpStatus.OK)
-  getCurrentUserStatistic() {}
+  async getCurrentUserStatistic() {
+    return this.queryBus.execute(new GetCurrentUserStatisticQuery());
+  }
 
   @Get('pairs/my-current')
   @HttpCode(HttpStatus.OK)
-  getCurrentUnfinishedUserGame() {}
+  async getCurrentUnfinishedUserGame() {
+    return this.queryBus.execute(new GetCurrentUnfinishedUserGameQuery());
+  }
 
   @Get('pairs/:id')
   @HttpCode(HttpStatus.OK)
-  getGameById() {}
+  async getGameById(@Param('id') id: string) {
+    return this.queryBus.execute(new GetGameByIdQuery(id));
+  }
 
   @Post('pairs/connection')
   @HttpCode(HttpStatus.OK)
-  connectCurrentUser() {}
+  async connectCurrentUser() {
+    return this.commandBus.execute(new ConnectCurrentUserCommand());
+  }
 
   @Post('pairs/my-current/answers')
   @HttpCode(HttpStatus.OK)
-  sendAnswerForNext() {}
+  async sendAnswerForNext() {
+    return this.commandBus.execute(new SendAnswerForNextCommand());
+  }
 }
 
 export default PairGameQuizController;
