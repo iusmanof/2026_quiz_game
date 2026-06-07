@@ -16,6 +16,7 @@ import { UpdateQuestionCommand } from '../../../questions/application/commands/u
 import { DeleteQuestionCommand } from '../../../questions/application/commands/delete-question.command-handler';
 import { PublishQuestionCommand } from '../../../questions/application/commands/publish-question.command-handler';
 import { GetAllQuestionsQuery } from '../../../questions/application/queries/get-all-questions.query-handler';
+import {QueryParamsDto} from "@modules/pair-quiz/questions/api/dto/query-params.dto";
 
 @Controller('/sa/quiz/')
 class QuestionsController {
@@ -27,24 +28,14 @@ class QuestionsController {
   @Get('questions')
   @HttpCode(HttpStatus.OK)
   async getAllQuestions(
-    @Query('pageNumber') pageNumber: number = 1,
-    @Query('pageSize') pageSize: number = 10,
-    @Query('sortBy') sortBy: string = 'createdAt',
-    @Query('sortDirection') sortDirection: string = 'desc',
-    @Query('bodySearchTerm') bodySearchTerm?: string,
-    @Query('publishedOnly') publishedOnly?: boolean,
+    @Query() queryParams: QueryParamsDto,
   ) {
     return this.queryBus.execute(
-      new GetAllQuestionsQuery(
-        pageNumber,
-        pageSize,
-        sortBy,
-        sortDirection,
-        bodySearchTerm,
-        publishedOnly,
-      ),
+      new GetAllQuestionsQuery(queryParams),
     );
   }
+
+  // TODO 
 
   @Post('questions')
   @HttpCode(HttpStatus.CREATED)

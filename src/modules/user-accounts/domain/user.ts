@@ -3,7 +3,7 @@ import { SessionEntity } from './session.entity';
 import { UserEmailConfirmationEntity } from './user-email-confirmation.entity';
 
 @Entity({ name: 'Users' })
-export class UsersEntity {
+export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

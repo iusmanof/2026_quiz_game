@@ -9,6 +9,10 @@ import { GetCurrentUnfinishedUserGameQueryHandler } from '@modules/pair-quiz/gam
 import { GetGameByIdQueryHandler } from '@modules/pair-quiz/game/application/queries/get-game-by-id.query-handler';
 import { ConnectCurrentUserUseCase } from '@modules/pair-quiz/game/application/commands/connect-current-user.command-handler';
 import { SendAnswerForNextUseCase } from '@modules/pair-quiz/game/application/commands/send-answer-for-next.command-handler';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
+import { Game } from '@modules/pair-quiz/game/domain/game.entity';
+import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
 
 const controllers = [PairGameQuizController, QuestionsController];
 const repositories = [];
@@ -24,7 +28,7 @@ const services = [];
 const exportsRepo = [];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [CqrsModule, TypeOrmModule.forFeature([PlayerProgress, Game, Question])],
   controllers: [...controllers],
   providers: [...repositories, ...useCases, ...handlers, ...services],
   exports: [...exportsRepo],

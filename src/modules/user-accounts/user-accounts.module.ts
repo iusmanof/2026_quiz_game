@@ -8,7 +8,7 @@ import { UsersQueryRepository } from './infrastructure/users.query-repository';
 import UsersRepository from './infrastructure/users.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersEntity } from './domain/users.entity';
+import { User } from './domain/user';
 import { AuthController } from './api/controllers/auth.controller';
 import { NotificationModule } from '../notification/notification.module';
 import { PassportModule } from '@nestjs/passport';
@@ -69,7 +69,7 @@ const handlers = [GetUsersQueryHandler, GetUserByIdQueryHandler, GetDevicesQuery
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([UsersEntity]),
+    TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([SessionEntity]),
     TypeOrmModule.forFeature([UserEmailConfirmationEntity]),
     PassportModule,

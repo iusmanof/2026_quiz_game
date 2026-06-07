@@ -1,4 +1,4 @@
-import { UsersEntity } from '../../domain/users.entity';
+import { User } from '../../domain/user';
 
 export class UserViewDto {
   id: string;
@@ -6,7 +6,7 @@ export class UserViewDto {
   email: string;
   createdAt: Date;
 
-  static mapToView = (user: UsersEntity): UserViewDto => {
+  static mapToView = (user: User): UserViewDto => {
     return {
       id: user.id,
       login: user.login,

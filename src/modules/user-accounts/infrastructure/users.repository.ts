@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserDbType } from '../types/user-db.type';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { UsersEntity } from '../domain/users.entity';
+import { User } from '../domain/user';
 
 @Injectable()
 class UsersRepository {
@@ -16,7 +16,7 @@ class UsersRepository {
                    VALUES ( $1, $2, $3 ) 
                    RETURNING *;`;
     const values = [dto.login, dto.email, dto.passwordHash];
-    const result: UsersEntity[] = await this.dataSource.query(query, values);
+    const result: User[] = await this.dataSource.query(query, values);
     return result[0];
   }
 
@@ -35,7 +35,7 @@ class UsersRepository {
     await this.dataSource.query(query, values);
   }
   // TODO delete if not necessary
-  async save(user: UsersEntity): Promise<UsersEntity> {
+  async save(user: User): Promise<User> {
     const query = `
     UPDATE "Users"
     SET
@@ -46,7 +46,7 @@ class UsersRepository {
     RETURNING *;
   `;
     const values = [user.login, user.email, user.passwordHash, user.id];
-    const result: UsersEntity[] = await this.dataSource.query(query, values);
+    const result: User[] = await this.dataSource.query(query, values);
     return result[0];
   }
 

@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { PostsEntity } from '@modules/bloggers-platform/posts/domain/post.entity';
-import { UsersEntity } from '@user-accounts/domain/users.entity';
+import { User } from '@user-accounts/domain/user';
 import type { LikeStatus } from '@modules/bloggers-platform/posts/types/like-status.type';
 
 @Entity('PostLikes')
@@ -18,9 +18,9 @@ export class PostLikesEntity {
   @Column({ type: 'uuid' })
   userId: string;
 
-  @ManyToOne(() => UsersEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: UsersEntity;
+  user: User;
 
   @Column({ type: 'varchar' })
   status: LikeStatus;

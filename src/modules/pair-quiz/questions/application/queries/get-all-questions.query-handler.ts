@@ -1,19 +1,19 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryParamsDto } from '@modules/pair-quiz/questions/api/dto/query-params.dto';
+import { Inject } from '@nestjs/common';
+import { QuestionQueryRepository } from '@modules/pair-quiz/questions/infrastructure/question.query-repository';
 
 export class GetAllQuestionsQuery {
-  constructor(
-    public pageNumber: number = 1,
-    public pageSize: number = 10,
-    public sortBy: string = 'createdAt',
-    public sortDirection: string = 'desc',
-    public bodySearchTerm?: string,
-    public publishedOnly?: boolean,
-  ) {}
+  constructor(public querParams: QueryParamsDto) {}
 }
 
 @QueryHandler(GetAllQuestionsQuery)
 export class GetAllQuestionsQueryHandler implements IQueryHandler<GetAllQuestionsQuery> {
+  constructor(
+    @Inject(QuestionQueryRepository)
+    private readonly questionsQueryRepository: QuestionQueryRepository,
+  ) {}
   async execute(query: GetAllQuestionsQuery) {
-    // TODO: Implement once repository is available
+    const { items, totalCount } = await this.questionsQueryRepository.getAll(query.querParams);
   }
 }

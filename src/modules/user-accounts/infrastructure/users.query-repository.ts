@@ -3,7 +3,7 @@ import { UsersQueryParamsDto, UsersSortBy } from '../api/dto/users-query-params.
 import { SortDirection } from '@core/dto/base.query-params.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { UsersEntity } from '../domain/users.entity';
+import { User } from '../domain/user';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -13,7 +13,7 @@ export class UsersQueryRepository {
   ) {}
 
   async getAll(query: UsersQueryParamsDto) {
-    const allUsers: UsersEntity[] = await this.dataSource.query(
+    const allUsers: User[] = await this.dataSource.query(
       `SELECT id, login, email, "createdAt" FROM "Users"`,
     );
 
@@ -28,7 +28,7 @@ export class UsersQueryRepository {
       return loginMatch || emailMatch;
     });
 
-    const sortFieldMap: Record<UsersSortBy, keyof UsersEntity> = {
+    const sortFieldMap: Record<UsersSortBy, keyof User> = {
       login: 'login',
       email: 'email',
       createdAt: 'createdAt',
@@ -58,23 +58,23 @@ export class UsersQueryRepository {
     };
   }
 
-  async findByLoginOrEmail(loginOrEmail: string): Promise<UsersEntity | null> {
+  async findByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
     console.log(loginOrEmail);
     const querySql = `SELECT * FROM "Users" WHERE login = $1 OR email = $1;`;
-    const result: UsersEntity[] = await this.dataSource.query(querySql, [loginOrEmail]);
+    const result: User[] = await this.dataSource.query(querySql, [loginOrEmail]);
     return result[0] ?? null;
   }
-  async findById(id: string): Promise<UsersEntity | null> {
+  async findById(id: string): Promise<User | null> {
     const query = `SELECT * FROM "Users" WHERE id = $1`;
     const values = [id];
-    const result: UsersEntity[] = await this.dataSource.query(query, values);
+    const result: User[] = await this.dataSource.query(query, values);
     return result.length ? result[0] : null;
   }
 
-  async findByEmail(email: string): Promise<UsersEntity | null> {
+  async findByEmail(email: string): Promise<User | null> {
     const query = `SELECT * FROM "Users" WHERE email = $1;`;
     const values = [email];
-    const result: UsersEntity[] = await this.dataSource.query(query, values);
+    const result: User[] = await this.dataSource.query(query, values);
     return result[0] ?? null;
   }
 }

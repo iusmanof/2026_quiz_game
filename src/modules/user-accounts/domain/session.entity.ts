@@ -1,16 +1,16 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { UsersEntity } from './users.entity';
+import { User } from './user';
 
 @Entity({ name: 'Session' })
 export class SessionEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.sessions, {
+  @ManyToOne(() => User, (user) => user.sessions, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'userId' })
-  user: UsersEntity;
+  user: User;
 
   @Column('uuid')
   userId: string;
