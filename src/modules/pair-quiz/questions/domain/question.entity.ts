@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Questions')
 export class Question {
@@ -10,4 +10,10 @@ export class Question {
 
   @Column('text', { array: true })
   correctAnswers: string[];
+
+  @Column({ default: false })
+  published: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

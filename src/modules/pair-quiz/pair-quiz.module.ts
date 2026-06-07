@@ -13,9 +13,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
 import { Game } from '@modules/pair-quiz/game/domain/game.entity';
 import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
+import {
+    GetAllQuestionsQueryHandler
+} from "@modules/pair-quiz/questions/application/queries/get-all-questions.query-handler";
+import QuestionQueryRepository from "@modules/pair-quiz/questions/infrastructure/question.query-repository";
 
 const controllers = [PairGameQuizController, QuestionsController];
-const repositories = [];
+const repositories = [QuestionQueryRepository];
 const useCases = [ConnectCurrentUserUseCase, SendAnswerForNextUseCase];
 const handlers = [
   GetTopUsersQueryHandler,
@@ -23,6 +27,7 @@ const handlers = [
   GetCurrentUserStatisticQueryHandler,
   GetCurrentUnfinishedUserGameQueryHandler,
   GetGameByIdQueryHandler,
+  GetAllQuestionsQueryHandler,
 ];
 const services = [];
 const exportsRepo = [];
