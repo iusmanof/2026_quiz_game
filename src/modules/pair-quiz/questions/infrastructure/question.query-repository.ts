@@ -45,6 +45,12 @@ class QuestionQueryRepository {
       items,
     };
   }
+
+  async getById(id: number) {
+    return this.dataSource.getRepository(Question).findOne({
+      where: { id },
+    });
+  }
 }
 
 export default QuestionQueryRepository;

@@ -16,7 +16,10 @@ import { UpdateQuestionCommand } from '../../../questions/application/commands/u
 import { DeleteQuestionCommand } from '../../../questions/application/commands/delete-question.command-handler';
 import { PublishQuestionCommand } from '../../../questions/application/commands/publish-question.command-handler';
 import { GetAllQuestionsQuery } from '../../../questions/application/queries/get-all-questions.query-handler';
-import {QueryParamsDto} from "@modules/pair-quiz/questions/api/dto/query-params.dto";
+import { QueryParamsDto } from '@modules/pair-quiz/questions/api/dto/query-params.dto';
+import { CreateQuestionDto } from '@modules/pair-quiz/questions/api/dto/create-question.dto';
+import { PaginatedViewDto } from '@core/dto/paginated-view.dto';
+import { QuestionViewDto } from '@modules/pair-quiz/questions/application/queries/dto/question-view.dto';
 
 @Controller('/sa/quiz/')
 class QuestionsController {
@@ -29,18 +32,14 @@ class QuestionsController {
   @HttpCode(HttpStatus.OK)
   async getAllQuestions(
     @Query() queryParams: QueryParamsDto,
-  ) {
-    return this.queryBus.execute(
-      new GetAllQuestionsQuery(queryParams),
-    );
+  ): Promise<PaginatedViewDto<QuestionViewDto>> {
+    return this.queryBus.execute(new GetAllQuestionsQuery(queryParams));
   }
-
-  // TODO 
 
   @Post('questions')
   @HttpCode(HttpStatus.CREATED)
-  async createQuestion(@Body() dto: { body: string; correctAnswers: string[] }) {
-    return this.commandBus.execute(new CreateQuestionCommand(dto.body, dto.correctAnswers));
+  async createQuestion(@Body() dto: CreateQuestionDto): Promise<CreateQuestionDto> {
+    return this.commandBus.execute(new CreateQuestionCommand(dto));
   }
 
   @Delete('questions/:id')

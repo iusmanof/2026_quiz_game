@@ -1,15 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import QuestionRepository from '@modules/pair-quiz/questions/infrastructure/question.repository';
+import { CreateQuestionDto } from '@modules/pair-quiz/questions/api/dto/create-question.dto';
 
 export class CreateQuestionCommand {
-  constructor(
-    public body: string,
-    public correctAnswers: string[],
-  ) {}
+  constructor(public createQuestionDto: CreateQuestionDto) {}
 }
 
 @CommandHandler(CreateQuestionCommand)
 export class CreateQuestionUseCase implements ICommandHandler<CreateQuestionCommand> {
+  constructor(private readonly questionRepository: QuestionRepository) {}
+
   async execute(command: CreateQuestionCommand) {
-    // TODO: Implement once repository/domain is available
+    return await this.questionRepository.create(command.createQuestionDto);
   }
 }

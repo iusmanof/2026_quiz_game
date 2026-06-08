@@ -16,11 +16,13 @@ import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
 import {
     GetAllQuestionsQueryHandler
 } from "@modules/pair-quiz/questions/application/queries/get-all-questions.query-handler";
-import QuestionQueryRepository from "@modules/pair-quiz/questions/infrastructure/question.query-repository";
+import QuestionQueryRepository from '@modules/pair-quiz/questions/infrastructure/question.query-repository';
+import { CreateQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/create-question.command-handler';
+import QuestionRepository from '@modules/pair-quiz/questions/infrastructure/question.repository';
 
 const controllers = [PairGameQuizController, QuestionsController];
-const repositories = [QuestionQueryRepository];
-const useCases = [ConnectCurrentUserUseCase, SendAnswerForNextUseCase];
+const repositories = [QuestionQueryRepository, QuestionRepository];
+const useCases = [ConnectCurrentUserUseCase, SendAnswerForNextUseCase, CreateQuestionUseCase];
 const handlers = [
   GetTopUsersQueryHandler,
   GetCurrentGamesQueryHandler,
