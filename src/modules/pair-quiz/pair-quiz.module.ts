@@ -13,16 +13,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
 import { Game } from '@modules/pair-quiz/game/domain/game.entity';
 import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
-import {
-    GetAllQuestionsQueryHandler
-} from "@modules/pair-quiz/questions/application/queries/get-all-questions.query-handler";
+import { GetAllQuestionsQueryHandler } from '@modules/pair-quiz/questions/application/queries/get-all-questions.query-handler';
 import QuestionQueryRepository from '@modules/pair-quiz/questions/infrastructure/question.query-repository';
 import { CreateQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/create-question.command-handler';
 import QuestionRepository from '@modules/pair-quiz/questions/infrastructure/question.repository';
+import { DeleteQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/delete-question.command-handler';
 
 const controllers = [PairGameQuizController, QuestionsController];
 const repositories = [QuestionQueryRepository, QuestionRepository];
-const useCases = [ConnectCurrentUserUseCase, SendAnswerForNextUseCase, CreateQuestionUseCase];
+const useCases = [
+  ConnectCurrentUserUseCase,
+  SendAnswerForNextUseCase,
+  CreateQuestionUseCase,
+  DeleteQuestionUseCase,
+];
 const handlers = [
   GetTopUsersQueryHandler,
   GetCurrentGamesQueryHandler,

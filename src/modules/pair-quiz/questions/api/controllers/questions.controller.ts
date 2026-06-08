@@ -9,6 +9,7 @@ import {
   Body,
   Param,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateQuestionCommand } from '../../../questions/application/commands/create-question.command-handler';
@@ -20,6 +21,11 @@ import { QueryParamsDto } from '@modules/pair-quiz/questions/api/dto/query-param
 import { CreateQuestionDto } from '@modules/pair-quiz/questions/api/dto/create-question.dto';
 import { PaginatedViewDto } from '@core/dto/paginated-view.dto';
 import { QuestionViewDto } from '@modules/pair-quiz/questions/application/queries/dto/question-view.dto';
+import {
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 @Controller('/sa/quiz/')
 class QuestionsController {
@@ -28,6 +34,7 @@ class QuestionsController {
     private readonly queryBus: QueryBus,
   ) {}
 
+  // TODO add AUTH and fix auth with swagger config
   @Get('questions')
   @HttpCode(HttpStatus.OK)
   async getAllQuestions(
@@ -36,18 +43,30 @@ class QuestionsController {
     return this.queryBus.execute(new GetAllQuestionsQuery(queryParams));
   }
 
+  // TODO add AUTH and fix auth with swagger config
   @Post('questions')
   @HttpCode(HttpStatus.CREATED)
   async createQuestion(@Body() dto: CreateQuestionDto): Promise<CreateQuestionDto> {
     return this.commandBus.execute(new CreateQuestionCommand(dto));
   }
 
-  @Delete('questions/:id')
+  // TODO add AUTH and fix auth with swagger config
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteQuestion(@Param('id') id: string) {
-    return this.commandBus.execute(new DeleteQuestionCommand(id));
+  @ApiNoContentResponse({
+    description: 'Question deleted successfully',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
+  @ApiNotFoundResponse({
+    description: 'Question not found',
+  })
+  async deleteQuestion(@Param('id', ParseIntPipe) id: number) {
+    await this.commandBus.execute(new DeleteQuestionCommand(id));
   }
 
+  // TODO
   @Put('questions/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async editQuestions(

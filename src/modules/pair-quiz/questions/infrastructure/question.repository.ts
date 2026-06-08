@@ -20,6 +20,15 @@ class QuestionRepository {
     });
     await repo.save(question);
   }
+
+  async delete(id: number) {
+    await this.dataSource
+      .createQueryBuilder()
+      .delete()
+      .from(Question)
+      .where('id = :id', { id: id })
+      .execute();
+  }
 }
 
 export default QuestionRepository;
