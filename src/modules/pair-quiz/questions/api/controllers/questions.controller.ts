@@ -26,6 +26,8 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { UpdateQuestionDto } from '@modules/pair-quiz/questions/api/dto/update-question.dto';
+import { PublishedQuestionDto } from '@modules/pair-quiz/questions/api/dto/published-question.dto';
 
 @Controller('/sa/quiz/')
 class QuestionsController {
@@ -66,20 +68,19 @@ class QuestionsController {
     await this.commandBus.execute(new DeleteQuestionCommand(id));
   }
 
-  // TODO
   @Put('questions/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async editQuestions(
-    @Param('id') id: string,
-    @Body() dto: { body: string; correctAnswers: string[] },
-  ) {
-    return this.commandBus.execute(new UpdateQuestionCommand(id, dto.body, dto.correctAnswers));
+  async editQuestions(@Param('id') id: number, @Body() dto: UpdateQuestionDto): Promise<void> {
+    return this.commandBus.execute(new UpdateQuestionCommand(id, dto));
   }
 
   @Put('questions/:id/publish')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async publishQuestion(@Param('id') id: string) {
-    return this.commandBus.execute(new PublishQuestionCommand(id));
+  async publishQuestion(
+    @Param('id') id: number,
+    @Body() published: PublishedQuestionDto,
+  ): Promise<void> {
+    return this.commandBus.execute(new PublishQuestionCommand(id, published));
   }
 }
 

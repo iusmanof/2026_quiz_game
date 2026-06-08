@@ -18,6 +18,8 @@ import QuestionQueryRepository from '@modules/pair-quiz/questions/infrastructure
 import { CreateQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/create-question.command-handler';
 import QuestionRepository from '@modules/pair-quiz/questions/infrastructure/question.repository';
 import { DeleteQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/delete-question.command-handler';
+import { PublishQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/publish-question.command-handler';
+import { UpdateQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/update-question.command-handler';
 
 const controllers = [PairGameQuizController, QuestionsController];
 const repositories = [QuestionQueryRepository, QuestionRepository];
@@ -26,6 +28,8 @@ const useCases = [
   SendAnswerForNextUseCase,
   CreateQuestionUseCase,
   DeleteQuestionUseCase,
+  UpdateQuestionUseCase,
+  PublishQuestionUseCase,
 ];
 const handlers = [
   GetTopUsersQueryHandler,
@@ -36,7 +40,7 @@ const handlers = [
   GetAllQuestionsQueryHandler,
 ];
 const services = [];
-const exportsRepo = [];
+const exportsRepo = [QuestionRepository];
 
 @Module({
   imports: [CqrsModule, TypeOrmModule.forFeature([PlayerProgress, Game, Question])],
