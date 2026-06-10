@@ -1,11 +1,12 @@
 import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
 
 export class QuestionViewDto {
-  id: number;
+  id: string;
   body: string;
   correctAnswers: string[];
   published: boolean;
   createdAt: string;
+  updatedAt: string | null;
 
   static mapToView(question: Question): QuestionViewDto {
     return {
@@ -14,6 +15,7 @@ export class QuestionViewDto {
       correctAnswers: question.correctAnswers,
       published: question.published,
       createdAt: question.createdAt.toISOString(),
+      updatedAt: question.updatedAt?.toISOString() ?? null,
     };
   }
 }

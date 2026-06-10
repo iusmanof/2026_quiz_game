@@ -9,7 +9,7 @@ import {
   Body,
   Param,
   Query,
-  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateQuestionCommand } from '../../../questions/application/commands/create-question.command-handler';
@@ -28,7 +28,9 @@ import {
 } from '@nestjs/swagger';
 import { UpdateQuestionDto } from '@modules/pair-quiz/questions/api/dto/update-question.dto';
 import { PublishedQuestionDto } from '@modules/pair-quiz/questions/api/dto/published-question.dto';
+import { BasicAuthGuard } from '@user-accounts/guards/basic/basic.guard';
 
+@UseGuards(BasicAuthGuard)
 @Controller('/sa/quiz/')
 class QuestionsController {
   constructor(
@@ -53,7 +55,7 @@ class QuestionsController {
   }
 
   // TODO add AUTH and fix auth with swagger config
-  @Delete(':id')
+  @Delete('questions/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
     description: 'Question deleted successfully',
@@ -64,20 +66,20 @@ class QuestionsController {
   @ApiNotFoundResponse({
     description: 'Question not found',
   })
-  async deleteQuestion(@Param('id', ParseIntPipe) id: number) {
+  async deleteQuestion(@Param('id') id: string) {
     await this.commandBus.execute(new DeleteQuestionCommand(id));
   }
 
   @Put('questions/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async editQuestions(@Param('id') id: number, @Body() dto: UpdateQuestionDto): Promise<void> {
+  async editQuestions(@Param('id') id: string, @Body() dto: UpdateQuestionDto): Promise<void> {
     return this.commandBus.execute(new UpdateQuestionCommand(id, dto));
   }
 
   @Put('questions/:id/publish')
   @HttpCode(HttpStatus.NO_CONTENT)
   async publishQuestion(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() published: PublishedQuestionDto,
   ): Promise<void> {
     return this.commandBus.execute(new PublishQuestionCommand(id, published));

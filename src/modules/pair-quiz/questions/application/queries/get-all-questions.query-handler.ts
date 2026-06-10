@@ -2,7 +2,6 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { QueryParamsDto } from '@modules/pair-quiz/questions/api/dto/query-params.dto';
 import { Inject } from '@nestjs/common';
 import QuestionQueryRepository from '@modules/pair-quiz/questions/infrastructure/question.query-repository';
-import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
 import { PaginatedViewDto } from '@core/dto/paginated-view.dto';
 import { QuestionViewDto } from '@modules/pair-quiz/questions/application/queries/dto/question-view.dto';
 

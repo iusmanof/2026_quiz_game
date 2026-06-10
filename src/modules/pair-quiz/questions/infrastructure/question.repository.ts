@@ -13,6 +13,12 @@ class QuestionRepository {
     protected dataSource: DataSource,
   ) {}
 
+  async findById(id: string) {
+    return this.dataSource.getRepository(Question).findOne({
+      where: { id },
+    });
+  }
+
   async create(createQuestionDto: CreateQuestionDto) {
     const repo = this.dataSource.getRepository(Question);
 
@@ -21,9 +27,10 @@ class QuestionRepository {
       correctAnswers: createQuestionDto.correctAnswers,
     });
     await repo.save(question);
+    return question;
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     await this.dataSource
       .createQueryBuilder()
       .delete()
@@ -32,20 +39,23 @@ class QuestionRepository {
       .execute();
   }
 
-  async update(id: number, dto: UpdateQuestionDto) {
+  async update(id: string, dto: UpdateQuestionDto) {
     await this.dataSource
       .createQueryBuilder()
       .update(Question)
-      .set({ body: dto.body, correctAnswers: dto.correctAnswers })
+      .set({ body: dto.body, correctAnswers: dto.correctAnswers, updatedAt: new Date() })
       .where('id = :id', { id })
       .execute();
   }
 
-  async setPublished(id: number, dto: PublishedQuestionDto) {
+  async setPublished(id: string, dto: PublishedQuestionDto) {
     await this.dataSource
       .createQueryBuilder()
       .update(Question)
-      .set({ published: dto.published })
+      .set({
+        published: dto.published,
+        updatedAt: new Date(),
+      })
       .where('id = :id', { id })
       .execute();
   }

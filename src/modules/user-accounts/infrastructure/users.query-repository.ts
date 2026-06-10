@@ -59,7 +59,6 @@ export class UsersQueryRepository {
   }
 
   async findByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
-    console.log(loginOrEmail);
     const querySql = `SELECT * FROM "Users" WHERE login = $1 OR email = $1;`;
     const result: User[] = await this.dataSource.query(querySql, [loginOrEmail]);
     return result[0] ?? null;

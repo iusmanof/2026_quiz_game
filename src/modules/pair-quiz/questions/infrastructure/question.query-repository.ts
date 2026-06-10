@@ -31,7 +31,7 @@ class QuestionQueryRepository {
     const totalCount = await queryBuilder.getCount();
 
     const items = await queryBuilder
-      .select(['q.id', 'q.body', 'q.correctAnswers', 'q.createdAt', 'q.published'])
+      .select(['q.id', 'q.body', 'q.correctAnswers', 'q.createdAt', 'q.published', 'q.updatedAt'])
       .orderBy(`q.${sortBy}`, sortDirection.toUpperCase() as 'ASC' | 'DESC')
       .skip((pageNumber - 1) * pageSize)
       .take(pageSize)
@@ -45,21 +45,6 @@ class QuestionQueryRepository {
       items,
     };
   }
-
-  async getById(id: number) {
-    return this.dataSource.getRepository(Question).findOne({
-      where: { id },
-    });
-  }
 }
 
 export default QuestionQueryRepository;
-
-// "id": "string",
-//     "body": "string",
-//     "correctAnswers": [
-//     "string"
-// ],
-//     "published": false,
-//     "createdAt": "2026-06-07T09:37:09.750Z",
-//     "updatedAt": "2026-06-07T09:37:09.750Z"

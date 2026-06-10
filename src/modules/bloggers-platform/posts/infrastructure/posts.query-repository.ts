@@ -83,10 +83,6 @@ class PostsQueryRepository {
     WHERE p."id" = $1`;
     const values = [postId];
 
-    if (currentUserId) {
-      console.log(currentUserId);
-    }
-
     const result: PostsEntity[] = await this.dataSource.query(query, values);
     return result[0];
   }

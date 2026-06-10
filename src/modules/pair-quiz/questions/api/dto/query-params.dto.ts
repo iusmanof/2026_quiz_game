@@ -4,6 +4,8 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum SortBy {
   CreatedAt = 'createdAt',
+  body = 'body',
+  correctAnswers = 'correctAnswers',
 }
 
 export enum PublishedStatus {
