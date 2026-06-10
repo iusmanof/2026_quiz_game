@@ -38,7 +38,6 @@ class QuestionsController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  // TODO add AUTH and fix auth with swagger config
   @Get('questions')
   @HttpCode(HttpStatus.OK)
   async getAllQuestions(
@@ -47,14 +46,12 @@ class QuestionsController {
     return this.queryBus.execute(new GetAllQuestionsQuery(queryParams));
   }
 
-  // TODO add AUTH and fix auth with swagger config
   @Post('questions')
   @HttpCode(HttpStatus.CREATED)
   async createQuestion(@Body() dto: CreateQuestionDto): Promise<CreateQuestionDto> {
     return this.commandBus.execute(new CreateQuestionCommand(dto));
   }
 
-  // TODO add AUTH and fix auth with swagger config
   @Delete('questions/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
