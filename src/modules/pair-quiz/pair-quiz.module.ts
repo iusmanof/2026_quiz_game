@@ -20,9 +20,12 @@ import QuestionRepository from '@modules/pair-quiz/questions/infrastructure/ques
 import { DeleteQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/delete-question.command-handler';
 import { PublishQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/publish-question.command-handler';
 import { UpdateQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/update-question.command-handler';
+import GameRepository from '@modules/pair-quiz/game/infrastructure/game.repository';
+import {UserAccountsModule} from "@user-accounts/user-accounts.module";
+import {PlayerAnswer} from "@modules/pair-quiz/game/domain/player-answer.entity";
 
 const controllers = [PairGameQuizController, QuestionsController];
-const repositories = [QuestionQueryRepository, QuestionRepository];
+const repositories = [QuestionQueryRepository, QuestionRepository, GameRepository];
 const useCases = [
   ConnectCurrentUserUseCase,
   SendAnswerForNextUseCase,
@@ -43,7 +46,11 @@ const services = [];
 const exportsRepo = [QuestionRepository];
 
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([PlayerProgress, Game, Question])],
+  imports: [
+    CqrsModule,
+    TypeOrmModule.forFeature([PlayerProgress, Game, Question, PlayerAnswer]),
+    UserAccountsModule,
+  ],
   controllers: [...controllers],
   providers: [...repositories, ...useCases, ...handlers, ...services],
   exports: [...exportsRepo],

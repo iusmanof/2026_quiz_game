@@ -1,12 +1,77 @@
-import { Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
+import { User } from '@user-accounts/domain/user';
+import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
+
+export enum GameStatus {
+  PendingSecondPlayer = 'PendingSecondPlayer',
+  Active = 'Active',
+  Finished = 'Finished',
+}
 
 @Entity('Game')
 export class Game {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  public id: string;
 
-  @OneToMany(() => PlayerProgress, (playerProgress) => playerProgress.game)
+  @Column({
+    type: 'enum',
+    enum: GameStatus,
+    default: GameStatus.PendingSecondPlayer,
+  })
+  status: string;
+
+  @OneToOne(() => PlayerProgress, {
+    cascade: true,
+  })
   @JoinColumn()
-  playersProgress: PlayerProgress[];
+  firstPlayerProgress: PlayerProgress;
+
+  @OneToOne(() => PlayerProgress, {
+    cascade: true,
+  })
+  @JoinColumn()
+  secondPlayerProgress: PlayerProgress | null;
+
+  @ManyToMany(() => Question)
+  @JoinTable()
+  questions: Question[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @CreateDateColumn()
+  pairCreatedDate: Date;
+
+  @CreateDateColumn()
+  startGameDate: Date;
+
+  @CreateDateColumn()
+  finishGameDate: Date;
+
+  static createPendingGame(user: User): Game {
+    const game = new Game();
+
+    const firstPlayerProgress = new PlayerProgress();
+
+    firstPlayerProgress.playerAccount = user;
+    firstPlayerProgress.score = 0;
+    firstPlayerProgress.answers = [];
+
+    game.firstPlayerProgress = firstPlayerProgress;
+    game.secondPlayerProgress = null;
+    game.status = GameStatus.PendingSecondPlayer;
+
+    return game;
+  }
 }

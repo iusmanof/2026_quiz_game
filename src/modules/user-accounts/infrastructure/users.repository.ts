@@ -34,6 +34,14 @@ class UsersRepository {
     const values = [params.id];
     await this.dataSource.query(query, values);
   }
+
+  async findById(id: string): Promise<User | null> {
+    const query = `SELECT * FROM "Users" WHERE id = $1`;
+    const values = [id];
+    const result: User[] = await this.dataSource.query(query, values);
+    return result.length ? result[0] : null;
+  }
+
   // TODO delete if not necessary
   async save(user: User): Promise<User> {
     const query = `

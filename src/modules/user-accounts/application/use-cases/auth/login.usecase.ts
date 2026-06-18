@@ -37,7 +37,6 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
       deviceId,
     });
 
-    // TODO use DDD
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
     const decoded: RefreshTokenPayload = this.refreshJwt.decode(refreshToken);
     const lastActiveDate = new Date(decoded.iat * 1000);

@@ -1,15 +1,24 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '@user-accounts/domain/user';
-import { Game } from '@modules/pair-quiz/game/domain/game.entity';
+import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
 
 @Entity('PlayerProgress')
 export class PlayerProgress {
-  @PrimaryGeneratedColumn('increment')
-  public id: number;
+  @PrimaryGeneratedColumn('uuid')
+  public id: string;
 
-  @ManyToOne(() => User)
+  @Column({
+    default: 0,
+  })
+  score: number;
+
+  @ManyToOne(() => User, {
+    eager: true,
+  })
   playerAccount: User;
 
-  @ManyToOne(() => Game)
-  game: Game;
+  @OneToMany(() => PlayerAnswer, (answer) => answer.playerProgress, {
+    cascade: true,
+  })
+  answers: PlayerAnswer[];
 }
