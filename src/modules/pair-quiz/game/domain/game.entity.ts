@@ -5,7 +5,6 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -73,5 +72,19 @@ export class Game {
     game.status = GameStatus.PendingSecondPlayer;
 
     return game;
+  }
+
+  connectSecondPlayer(user: User): void {
+    const secondPlayerProgress = new PlayerProgress();
+
+    secondPlayerProgress.playerAccount = user;
+    secondPlayerProgress.score = 0;
+    secondPlayerProgress.answers = [];
+
+    this.secondPlayerProgress = secondPlayerProgress;
+
+    this.status = GameStatus.Active;
+
+    this.startGameDate = new Date();
   }
 }

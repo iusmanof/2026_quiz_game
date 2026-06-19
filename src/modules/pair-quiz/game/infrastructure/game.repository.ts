@@ -18,10 +18,13 @@ class GameRepository {
       relations: {
         firstPlayerProgress: {
           playerAccount: true,
+          answers: true,
         },
         secondPlayerProgress: {
           playerAccount: true,
+          answers: true,
         },
+        questions: true,
       },
       order: {
         createdAt: 'ASC',
