@@ -1,4 +1,14 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetTopUsersQuery } from '../../application/queries/get-top-users.query-handler';
 import { GetCurrentGamesQuery } from '../../application/queries/get-current-games.query-handler';
@@ -10,6 +20,7 @@ import { SendAnswerForNextCommand } from '../../application/commands/send-answer
 import { JwtAuthGuard } from '@user-accounts/guards/bearer/jwt-auth.guard';
 import type { AuthenticatedRequest } from '@user-accounts/types/authenticated-request.interface';
 import { GameViewDto } from '@modules/pair-quiz/game/api/dto/game.view-dto';
+import { AnswerResponseDto } from '@modules/pair-quiz/game/api/dto/answer-response.dto';
 
 @Controller('pair-game-quiz')
 class PairGameQuizController {
@@ -36,10 +47,12 @@ class PairGameQuizController {
     return this.queryBus.execute(new GetCurrentUserStatisticQuery());
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('pairs/my-current')
   @HttpCode(HttpStatus.OK)
-  async getCurrentUnfinishedUserGame() {
-    return this.queryBus.execute(new GetCurrentUnfinishedUserGameQuery());
+  async getCurrentUnfinishedUserGame(@Req() req: AuthenticatedRequest): Promise<GameViewDto> {
+    const userId = req.user.id;
+    return this.queryBus.execute(new GetCurrentUnfinishedUserGameQuery(userId));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -50,7 +63,6 @@ class PairGameQuizController {
     @Param('id') id: string,
   ): Promise<GameViewDto> {
     const userId = req.user.id;
-    console.log(userId);
     return this.queryBus.execute(new GetGameByIdQuery(id, userId));
   }
 
@@ -62,10 +74,15 @@ class PairGameQuizController {
     return this.commandBus.execute(new ConnectCurrentUserCommand(userId));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('pairs/my-current/answers')
   @HttpCode(HttpStatus.OK)
-  async sendAnswerForNext() {
-    return this.commandBus.execute(new SendAnswerForNextCommand());
+  async sendAnswerForNext(
+    @Req() req: AuthenticatedRequest,
+    @Body('answer') answer: string,
+  ): Promise<AnswerResponseDto> {
+    const userId = req.user.id;
+    return this.commandBus.execute(new SendAnswerForNextCommand(userId, answer));
   }
 }
 

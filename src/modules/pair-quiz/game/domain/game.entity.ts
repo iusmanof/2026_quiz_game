@@ -11,6 +11,7 @@ import {
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
 import { User } from '@user-accounts/domain/user';
 import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
+import {AnswerStatus, PlayerAnswer} from "@modules/pair-quiz/game/domain/player-answer.entity";
 
 export enum GameStatus {
   PendingSecondPlayer = 'PendingSecondPlayer',
@@ -88,5 +89,42 @@ export class Game {
     this.status = GameStatus.Active;
 
     this.startGameDate = new Date();
+  }
+
+  getPlayerProgress(userId: string): PlayerProgress | null {
+    if (this.firstPlayerProgress.playerAccount.id === userId) {
+      return this.firstPlayerProgress;
+    }
+
+    if (this.secondPlayerProgress && this.secondPlayerProgress.playerAccount.id === userId) {
+      return this.secondPlayerProgress;
+    }
+
+    return null;
+  }
+
+  getNextQuestionForPlayer(playerProgress: PlayerProgress): Question | null {
+    const nextQuestionIndex = playerProgress.answers.length;
+
+    return this.questions[nextQuestionIndex] ?? null;
+  }
+  answerQuestion(playerProgress: PlayerProgress, question: Question, answer: string): PlayerAnswer {
+    const isCorrect = question.correctAnswers.some(
+      (correctAnswer) => correctAnswer.toLowerCase().trim() === answer.toLowerCase().trim(),
+    );
+
+    const playerAnswer = new PlayerAnswer();
+
+    playerAnswer.questionId = question.id;
+    playerAnswer.answerStatus = isCorrect ? AnswerStatus.Correct : AnswerStatus.Incorrect;
+    playerAnswer.addedAt = new Date();
+
+    playerProgress.answers.push(playerAnswer);
+
+    if (isCorrect) {
+      playerProgress.score += 1;
+    }
+
+    return playerAnswer;
   }
 }

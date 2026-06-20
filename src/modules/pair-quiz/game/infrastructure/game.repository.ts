@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Game, GameStatus } from '@modules/pair-quiz/game/domain/game.entity';
-import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
 import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
 
@@ -63,6 +62,19 @@ class GameRepository {
           },
         },
       ],
+      relations: {
+        questions: true,
+
+        firstPlayerProgress: {
+          playerAccount: true,
+          answers: true,
+        },
+
+        secondPlayerProgress: {
+          playerAccount: true,
+          answers: true,
+        },
+      },
     });
   }
 
