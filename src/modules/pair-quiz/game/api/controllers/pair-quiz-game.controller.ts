@@ -9,6 +9,7 @@ import { ConnectCurrentUserCommand } from '../../application/commands/connect-cu
 import { SendAnswerForNextCommand } from '../../application/commands/send-answer-for-next.command-handler';
 import { JwtAuthGuard } from '@user-accounts/guards/bearer/jwt-auth.guard';
 import type { AuthenticatedRequest } from '@user-accounts/types/authenticated-request.interface';
+import { GameViewDto } from '@modules/pair-quiz/game/api/dto/game.view-dto';
 
 @Controller('pair-game-quiz')
 class PairGameQuizController {
@@ -41,59 +42,22 @@ class PairGameQuizController {
     return this.queryBus.execute(new GetCurrentUnfinishedUserGameQuery());
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('pairs/:id')
   @HttpCode(HttpStatus.OK)
-  async getGameById(@Param('id') id: string) {
-    return this.queryBus.execute(new GetGameByIdQuery(id));
+  async getGameById(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ): Promise<GameViewDto> {
+    const userId = req.user.id;
+    console.log(userId);
+    return this.queryBus.execute(new GetGameByIdQuery(id, userId));
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('pairs/connection')
   @HttpCode(HttpStatus.OK)
-  async connectCurrentUser(@Req() req: AuthenticatedRequest) {
-    //   promise return
-    // {
-    //     "id": "string",
-    //     "firstPlayerProgress": {
-    //         "answers": [
-    //             {
-    //                 "questionId": "string",
-    //                 "answerStatus": "Correct",
-    //                 "addedAt": "2026-06-11T18:26:03.580Z"
-    //             }
-    //         ],
-    //         "player": {
-    //             "id": "string",
-    //             "login": "string"
-    //         },
-    //         "score": 0
-    //     },
-    //     "secondPlayerProgress": {
-    //         "answers": [
-    //             {
-    //                 "questionId": "string",
-    //                 "answerStatus": "Correct",
-    //                 "addedAt": "2026-06-11T18:26:03.581Z"
-    //             }
-    //         ],
-    //         "player": {
-    //             "id": "string",
-    //             "login": "string"
-    //         },
-    //         "score": 0
-    //     },
-    //     "questions": [
-    //         {
-    //             "id": "string",
-    //             "body": "string"
-    //         }
-    //     ],
-    //     "status": "PendingSecondPlayer",
-    //     "pairCreatedDate": "2026-06-11T18:26:03.581Z",
-    //     "startGameDate": "2026-06-11T18:26:03.581Z",
-    //     "finishGameDate": "2026-06-11T18:26:03.581Z"
-    // }
-
+  async connectCurrentUser(@Req() req: AuthenticatedRequest): Promise<GameViewDto> {
     const userId = req.user.id;
     return this.commandBus.execute(new ConnectCurrentUserCommand(userId));
   }

@@ -21,11 +21,17 @@ import { DeleteQuestionUseCase } from '@modules/pair-quiz/questions/application/
 import { PublishQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/publish-question.command-handler';
 import { UpdateQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/update-question.command-handler';
 import GameRepository from '@modules/pair-quiz/game/infrastructure/game.repository';
-import {UserAccountsModule} from "@user-accounts/user-accounts.module";
-import {PlayerAnswer} from "@modules/pair-quiz/game/domain/player-answer.entity";
+import { UserAccountsModule } from '@user-accounts/user-accounts.module';
+import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
+import GameQueryRepository from '@modules/pair-quiz/game/infrastructure/game.query-repository';
 
 const controllers = [PairGameQuizController, QuestionsController];
-const repositories = [QuestionQueryRepository, QuestionRepository, GameRepository];
+const repositories = [
+  QuestionQueryRepository,
+  QuestionRepository,
+  GameRepository,
+  GameQueryRepository,
+];
 const useCases = [
   ConnectCurrentUserUseCase,
   SendAnswerForNextUseCase,
@@ -43,7 +49,7 @@ const handlers = [
   GetAllQuestionsQueryHandler,
 ];
 const services = [];
-const exportsRepo = [QuestionRepository];
+const exportsRepo = [QuestionRepository, GameRepository];
 
 @Module({
   imports: [

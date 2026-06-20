@@ -32,12 +32,14 @@ export class Game {
 
   @OneToOne(() => PlayerProgress, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn()
   firstPlayerProgress: PlayerProgress;
 
   @OneToOne(() => PlayerProgress, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn()
   secondPlayerProgress: PlayerProgress | null;

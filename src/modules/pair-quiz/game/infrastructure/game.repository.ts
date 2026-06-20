@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Game, GameStatus } from '@modules/pair-quiz/game/domain/game.entity';
+import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
+import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
+import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
 
 @Injectable()
 class GameRepository {
@@ -32,25 +35,51 @@ class GameRepository {
     });
   }
 
-  async findActiveGameByUserId(userId: string): Promise<Game | null> {
-    return this.dataSource
-      .getRepository(Game)
-      .createQueryBuilder('g')
-      .leftJoinAndSelect('g.firstPlayerProgress', 'fp')
-      .leftJoinAndSelect('g.secondPlayerProgress', 'sp')
-      .leftJoin('fp.playerAccount', 'fpu')
-      .leftJoin('sp.playerAccount', 'spu')
-      .where('g.status IN (:...statuses)', {
-        statuses: [GameStatus.PendingSecondPlayer, GameStatus.Active],
-      })
-      .andWhere('(fpu.id = :userId OR spu.id = :userId)', {
-        userId,
-      })
-      .getOne();
+  async findCurrentGameByUserId(userId: string) {
+    return await this.dataSource.getRepository(Game).findOne({
+      where: [
+        {
+          status: GameStatus.PendingSecondPlayer,
+          firstPlayerProgress: {
+            playerAccount: {
+              id: userId,
+            },
+          },
+        },
+        {
+          status: GameStatus.Active,
+          firstPlayerProgress: {
+            playerAccount: {
+              id: userId,
+            },
+          },
+        },
+        {
+          status: GameStatus.Active,
+          secondPlayerProgress: {
+            playerAccount: {
+              id: userId,
+            },
+          },
+        },
+      ],
+    });
   }
 
   async save(game: Game): Promise<Game> {
     return this.dataSource.getRepository(Game).save(game);
+  }
+
+  async deleteAllGames() {
+    await this.dataSource.createQueryBuilder().delete().from(Game).execute();
+  }
+
+  async deleteAllPlayerProgress() {
+    await this.dataSource.createQueryBuilder().delete().from(PlayerProgress).execute();
+  }
+
+  async deleteAllPlayerAnswer() {
+    await this.dataSource.createQueryBuilder().delete().from(PlayerAnswer).execute();
   }
 }
 

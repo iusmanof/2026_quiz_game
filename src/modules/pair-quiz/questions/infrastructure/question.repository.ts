@@ -60,7 +60,7 @@ class QuestionRepository {
       .execute();
   }
 
-  async deleteAll() {
+  async deleteAllQuestion() {
     await this.dataSource.createQueryBuilder().delete().from(Question).execute();
   }
 }

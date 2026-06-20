@@ -14,6 +14,7 @@ export class PlayerProgress {
 
   @ManyToOne(() => User, {
     eager: true,
+    onDelete: 'CASCADE',
   })
   playerAccount: User;
 
