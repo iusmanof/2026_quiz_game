@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { Game, GameStatus } from '@modules/pair-quiz/game/domain/game.entity';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
 import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
+import {Question} from "@modules/pair-quiz/questions/domain/question.entity";
 
 @Injectable()
 class GameRepository {
@@ -77,6 +78,8 @@ class GameRepository {
       },
     });
   }
+
+
 
   async save(game: Game): Promise<Game> {
     return this.dataSource.getRepository(Game).save(game);

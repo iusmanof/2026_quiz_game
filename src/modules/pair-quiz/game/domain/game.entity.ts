@@ -11,7 +11,7 @@ import {
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
 import { User } from '@user-accounts/domain/user';
 import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
-import {AnswerStatus, PlayerAnswer} from "@modules/pair-quiz/game/domain/player-answer.entity";
+import { AnswerStatus, PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
 
 export enum GameStatus {
   PendingSecondPlayer = 'PendingSecondPlayer',
@@ -47,7 +47,7 @@ export class Game {
 
   @ManyToMany(() => Question)
   @JoinTable()
-  questions: Question[];
+  questions: Question[] | null;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -55,11 +55,11 @@ export class Game {
   @CreateDateColumn()
   pairCreatedDate: Date;
 
-  @CreateDateColumn()
-  startGameDate: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  startGameDate: Date | null;
 
-  @CreateDateColumn()
-  finishGameDate: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  finishGameDate: Date | null;
 
   static createPendingGame(user: User): Game {
     const game = new Game();
@@ -74,6 +74,10 @@ export class Game {
     game.secondPlayerProgress = null;
     game.status = GameStatus.PendingSecondPlayer;
 
+    game.startGameDate = null;
+    game.finishGameDate = null;
+    game.questions = null;
+
     return game;
   }
 
@@ -87,8 +91,11 @@ export class Game {
     this.secondPlayerProgress = secondPlayerProgress;
 
     this.status = GameStatus.Active;
-
     this.startGameDate = new Date();
+  }
+
+  assignQuestions(questions: Question[]): void {
+    this.questions = questions;
   }
 
   getPlayerProgress(userId: string): PlayerProgress | null {
@@ -106,7 +113,7 @@ export class Game {
   getNextQuestionForPlayer(playerProgress: PlayerProgress): Question | null {
     const nextQuestionIndex = playerProgress.answers.length;
 
-    return this.questions[nextQuestionIndex] ?? null;
+    return this.questions?.[nextQuestionIndex] ?? null;
   }
   answerQuestion(playerProgress: PlayerProgress, question: Question, answer: string): PlayerAnswer {
     const isCorrect = question.correctAnswers.some(
@@ -125,6 +132,23 @@ export class Game {
       playerProgress.score += 1;
     }
 
+    this.tryFinishGame();
+
     return playerAnswer;
+  }
+
+  private tryFinishGame(): void {
+    if (!this.secondPlayerProgress) {
+      return;
+    }
+
+    const firstPlayerFinished = this.firstPlayerProgress.answers.length === 5;
+
+    const secondPlayerFinished = this.secondPlayerProgress.answers.length === 5;
+
+    if (firstPlayerFinished && secondPlayerFinished) {
+      this.status = GameStatus.Finished;
+      this.finishGameDate = new Date();
+    }
   }
 }

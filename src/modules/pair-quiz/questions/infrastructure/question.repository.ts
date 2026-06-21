@@ -60,6 +60,16 @@ class QuestionRepository {
       .execute();
   }
 
+  async getRandomPublishedQuestions(count: number): Promise<Question[]> {
+    return await this.dataSource
+      .getRepository(Question)
+      .createQueryBuilder('q')
+      .where('q.published = true')
+      .orderBy('RANDOM()')
+      .limit(count)
+      .getMany();
+  }
+
   async deleteAllQuestion() {
     await this.dataSource.createQueryBuilder().delete().from(Question).execute();
   }

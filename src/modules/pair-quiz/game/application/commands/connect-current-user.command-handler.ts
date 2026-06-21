@@ -4,6 +4,7 @@ import { Game } from '@modules/pair-quiz/game/domain/game.entity';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import UsersRepository from '@user-accounts/infrastructure/users.repository';
 import { GameMapper } from '@modules/pair-quiz/game/api/mappers/game.mapper';
+import QuestionRepository from '@modules/pair-quiz/questions/infrastructure/question.repository';
 
 export class ConnectCurrentUserCommand {
   constructor(public userId: string) {}
@@ -13,6 +14,7 @@ export class ConnectCurrentUserCommand {
 export class ConnectCurrentUserUseCase implements ICommandHandler<ConnectCurrentUserCommand> {
   constructor(
     private readonly gameRepository: GameRepository,
+    private readonly questionRepository: QuestionRepository,
     private readonly userRepository: UsersRepository,
   ) {}
 
@@ -31,8 +33,11 @@ export class ConnectCurrentUserUseCase implements ICommandHandler<ConnectCurrent
     const pendingGame = await this.gameRepository.findPending();
 
     if (pendingGame?.status) {
+      const questions = await this.questionRepository.getRandomPublishedQuestions(5);
       pendingGame.connectSecondPlayer(user);
+      pendingGame.assignQuestions(questions);
       await this.gameRepository.save(pendingGame);
+
       return GameMapper.toView(pendingGame);
     }
 
