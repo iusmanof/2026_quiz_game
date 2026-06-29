@@ -33,7 +33,6 @@ export class GetGameByIdQueryHandler implements IQueryHandler<GetGameByIdQuery> 
     if (!isParticipant) {
       throw new ForbiddenException();
     }
-
     return GameMapper.toView(game);
   }
 }

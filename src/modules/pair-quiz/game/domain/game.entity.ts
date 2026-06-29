@@ -29,7 +29,7 @@ export class Game {
     enum: GameStatus,
     default: GameStatus.PendingSecondPlayer,
   })
-  status: string;
+  status: GameStatus;
 
   @OneToOne(() => PlayerProgress, {
     cascade: true,
@@ -111,9 +111,13 @@ export class Game {
   }
 
   getNextQuestionForPlayer(playerProgress: PlayerProgress): Question | null {
-    const nextQuestionIndex = playerProgress.answers.length;
+    if (!this.questions?.length) {
+      return null;
+    }
 
-    return this.questions?.[nextQuestionIndex] ?? null;
+    const answeredQuestionIds = new Set(playerProgress.answers.map((a) => a.questionId));
+
+    return this.questions.find((q) => !answeredQuestionIds.has(q.id)) ?? null;
   }
   answerQuestion(playerProgress: PlayerProgress, question: Question, answer: string): PlayerAnswer {
     const isCorrect = question.correctAnswers.some(
@@ -138,17 +142,40 @@ export class Game {
   }
 
   private tryFinishGame(): void {
-    if (!this.secondPlayerProgress) {
-      return;
+    if (!this.secondPlayerProgress) return;
+
+    const questionsCount = this.questions?.length ?? 0;
+
+    const firstFinished = this.firstPlayerProgress.answers.length === questionsCount;
+
+    const secondFinished = this.secondPlayerProgress.answers.length === questionsCount;
+
+    if (!firstFinished || !secondFinished) return;
+
+    const firstCorrect = this.firstPlayerProgress.score > 0;
+    const secondCorrect = this.secondPlayerProgress.score > 0;
+
+    const firstAnswers = [...this.firstPlayerProgress.answers].sort(
+      (a, b) => a.addedAt.getTime() - b.addedAt.getTime(),
+    );
+
+    const secondAnswers = [...this.secondPlayerProgress.answers].sort(
+      (a, b) => a.addedAt.getTime() - b.addedAt.getTime(),
+    );
+
+    const firstLast = firstAnswers.at(-1)?.addedAt?.getTime();
+
+    const secondLast = secondAnswers.at(-1)?.addedAt?.getTime();
+
+    if (!firstLast || !secondLast) return;
+
+    if (firstCorrect && firstLast < secondLast) {
+      this.firstPlayerProgress.score += 1;
+    } else if (secondCorrect && secondLast < firstLast) {
+      this.secondPlayerProgress.score += 1;
     }
 
-    const firstPlayerFinished = this.firstPlayerProgress.answers.length === 5;
-
-    const secondPlayerFinished = this.secondPlayerProgress.answers.length === 5;
-
-    if (firstPlayerFinished && secondPlayerFinished) {
-      this.status = GameStatus.Finished;
-      this.finishGameDate = new Date();
-    }
+    this.status = GameStatus.Finished;
+    this.finishGameDate = new Date();
   }
 }

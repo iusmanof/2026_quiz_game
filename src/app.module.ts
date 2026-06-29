@@ -11,12 +11,10 @@ import { PairQuizModule } from '@modules/pair-quiz/pair-quiz.module';
   imports: [
     configModule,
     PostgresqlDatabaseModule,
-    // CoreModule,
     UserAccountsModule,
     BloggersPlatformModule,
     PairQuizModule,
     DeleteAllDataModule,
-    // GlobalThrottlerModule,
   ],
   controllers: [],
   providers: [CoreConfig],

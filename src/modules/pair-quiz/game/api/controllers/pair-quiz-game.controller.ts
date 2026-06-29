@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '@user-accounts/guards/bearer/jwt-auth.guard';
 import type { AuthenticatedRequest } from '@user-accounts/types/authenticated-request.interface';
 import { GameViewDto } from '@modules/pair-quiz/game/api/dto/game.view-dto';
 import { AnswerResponseDto } from '@modules/pair-quiz/game/api/dto/answer-response.dto';
+import { ParseUUIDPipe } from '@nestjs/common';
 
 @Controller('pair-game-quiz')
 class PairGameQuizController {
@@ -60,7 +61,7 @@ class PairGameQuizController {
   @HttpCode(HttpStatus.OK)
   async getGameById(
     @Req() req: AuthenticatedRequest,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GameViewDto> {
     const userId = req.user.id;
     return this.queryBus.execute(new GetGameByIdQuery(id, userId));

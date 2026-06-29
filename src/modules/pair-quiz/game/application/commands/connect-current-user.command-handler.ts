@@ -32,7 +32,7 @@ export class ConnectCurrentUserUseCase implements ICommandHandler<ConnectCurrent
 
     const pendingGame = await this.gameRepository.findPending();
 
-    if (pendingGame?.status) {
+    if (pendingGame) {
       const questions = await this.questionRepository.getRandomPublishedQuestions(5);
       pendingGame.connectSecondPlayer(user);
       pendingGame.assignQuestions(questions);

@@ -1,11 +1,12 @@
 import { ConfigModule } from '@nestjs/config';
 
 export const configModule = ConfigModule.forRoot({
+  isGlobal: true,
   envFilePath: [
-    process.env.ENV_FILE_PATH?.trim() || '',
     `.env.${process.env.NODE_ENV}.local`,
     `.env.${process.env.NODE_ENV}`,
+    `.env.testing`,
     '.env.production',
+    '.env',
   ],
-  isGlobal: true,
 });

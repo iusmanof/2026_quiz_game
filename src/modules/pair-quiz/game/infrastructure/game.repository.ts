@@ -4,7 +4,6 @@ import { DataSource } from 'typeorm';
 import { Game, GameStatus } from '@modules/pair-quiz/game/domain/game.entity';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
 import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
-import {Question} from "@modules/pair-quiz/questions/domain/question.entity";
 
 @Injectable()
 class GameRepository {
@@ -13,8 +12,20 @@ class GameRepository {
     protected dataSource: DataSource,
   ) {}
 
+  private sortAnswers(game: Game | null): Game | null {
+    if (!game) {
+      return null;
+    }
+
+    game.firstPlayerProgress.answers?.sort((a, b) => a.addedAt.getTime() - b.addedAt.getTime());
+
+    game.secondPlayerProgress?.answers?.sort((a, b) => a.addedAt.getTime() - b.addedAt.getTime());
+
+    return game;
+  }
+
   async findPending(): Promise<Game | null> {
-    return this.dataSource.getRepository(Game).findOne({
+    const game = await this.dataSource.getRepository(Game).findOne({
       where: {
         status: GameStatus.PendingSecondPlayer,
       },
@@ -33,10 +44,12 @@ class GameRepository {
         createdAt: 'ASC',
       },
     });
+
+    return this.sortAnswers(game);
   }
 
   async findCurrentGameByUserId(userId: string) {
-    return await this.dataSource.getRepository(Game).findOne({
+    const game = await this.dataSource.getRepository(Game).findOne({
       where: [
         {
           status: GameStatus.PendingSecondPlayer,
@@ -65,21 +78,19 @@ class GameRepository {
       ],
       relations: {
         questions: true,
-
         firstPlayerProgress: {
           playerAccount: true,
           answers: true,
         },
-
         secondPlayerProgress: {
           playerAccount: true,
           answers: true,
         },
       },
     });
+
+    return this.sortAnswers(game);
   }
-
-
 
   async save(game: Game): Promise<Game> {
     return this.dataSource.getRepository(Game).save(game);

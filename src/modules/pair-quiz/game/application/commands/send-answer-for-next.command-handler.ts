@@ -22,7 +22,6 @@ export class SendAnswerForNextUseCase implements ICommandHandler<SendAnswerForNe
     if (!playerProgress) {
       throw new ForbiddenException();
     }
-
     const nextQuestion = game.getNextQuestionForPlayer(playerProgress);
 
     if (!nextQuestion) {

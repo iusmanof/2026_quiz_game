@@ -26,7 +26,7 @@ export class GameViewDto {
   id: string;
   firstPlayerProgress: IPlayerProgress;
   secondPlayerProgress: IPlayerProgress | null;
-  questions: IQuestion[];
+  questions: IQuestion[] | null;
   status: string;
   pairCreatedDate: Date;
   startGameDate: Date | null;
