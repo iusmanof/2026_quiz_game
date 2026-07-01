@@ -35,6 +35,7 @@ import { NewPasswordDto } from '../dto/new-password.dto';
 import { NewPasswordCommand } from '../../application/use-cases/auth/new-password.usecase';
 import { RegistrationConfirmationCommand } from '../../application/use-cases/auth/registration-confirmation.usecase';
 import { RegistrationEmailResendingCommand } from '../../application/use-cases/auth/registration-email-resending.usecase';
+import { LoginResponseDto } from '@user-accounts/api/dto/loign-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -51,7 +52,7 @@ export class AuthController {
     @LoginMetaDecorator() meta: LoginMeta,
     @Res({ passthrough: true })
     res: ExpressResponse,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<LoginResponseDto> {
     const result: LoginResult = await this.commandBus.execute(new LoginCommand(user.id, meta));
 
     res.cookie('refreshToken', result.refreshToken, COOKIE_OPTIONS);

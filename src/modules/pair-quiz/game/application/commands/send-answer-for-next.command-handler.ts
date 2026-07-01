@@ -14,6 +14,11 @@ export class SendAnswerForNextUseCase implements ICommandHandler<SendAnswerForNe
   constructor(private readonly gameRepository: GameRepository) {}
   async execute(command: SendAnswerForNextCommand) {
     const game = await this.gameRepository.findCurrentGameByUserId(command.userId);
+    console.log('CURRENT GAME', {
+      id: game?.id,
+      status: game?.status,
+    });
+
     if (!game) {
       throw new ForbiddenException();
     }
@@ -22,6 +27,14 @@ export class SendAnswerForNextUseCase implements ICommandHandler<SendAnswerForNe
     if (!playerProgress) {
       throw new ForbiddenException();
     }
+    console.log(
+      game.questions?.map((q, i) => ({
+        index: i,
+        id: q.id,
+      })),
+    );
+
+    console.log(playerProgress.answers.map((a) => a.questionId));
     const nextQuestion = game.getNextQuestionForPlayer(playerProgress);
 
     if (!nextQuestion) {
@@ -29,6 +42,15 @@ export class SendAnswerForNextUseCase implements ICommandHandler<SendAnswerForNe
     }
 
     const result = game.answerQuestion(playerProgress, nextQuestion, command.answer);
+
+    console.log({
+      gameId: game.id,
+      status: game.status,
+      firstAnswers: game.firstPlayerProgress.answers.length,
+      secondAnswers: game.secondPlayerProgress?.answers.length,
+      firstScore: game.firstPlayerProgress.score,
+      secondScore: game.secondPlayerProgress?.score,
+    });
 
     await this.gameRepository.save(game);
 

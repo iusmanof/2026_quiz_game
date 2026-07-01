@@ -4,7 +4,7 @@ import { UserViewDto } from '@user-accounts/api/dto/user-view.dto';
 import { getBasicAuthHeaderHelper } from './get-basic-auth-header.helper';
 import request from 'supertest';
 
-export const createUserHelper = async (
+export const createUserHelper =  async (
   app: INestApplication,
   dto: CreateUserDto,
 ): Promise<UserViewDto> => {

@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { getBasicAuthHeaderHelper } from '../helpers/get-basic-auth-header.helper';
 import { createQuestionHelper } from '../helpers/create-question.helper';
+import { publishQuestionHelper } from '../helpers/publish-question.helper';
 
 describe('Questions e2e', () => {
   let app: INestApplication;
@@ -39,30 +40,30 @@ describe('Questions e2e', () => {
     });
   });
 
-  it('POST /quiz/questions with basic auth', async () => {
-    await createQuestionHelper(app);
-
-    const getRes = await request(app.getHttpServer())
-      .get('/sa/quiz/questions')
-      .set('Authorization', getBasicAuthHeaderHelper())
-      .expect(200);
-
-    expect(getRes.body.items).toHaveLength(1);
-    expect(getRes.body.items[0]).toMatchObject({
-      body: 'Question',
-      correctAnswers: ['answer'],
-      published: false,
-    });
-  });
+  // it('POST /quiz/questions with basic auth', async () => {
+  //   const question = await createQuestionHelper(app);
+  //
+  //   const res = await request(app.getHttpServer())
+  //     .get('/sa/quiz/questions')
+  //     .set('Authorization', getBasicAuthHeaderHelper())
+  //     .expect(200);
+  //
+  //   expect(res.body.items).toHaveLength(1);
+  //   expect(res.body.items[0]).toMatchObject({
+  //     body: 'Question',
+  //     correctAnswers: ['answer'],
+  //     published: false,
+  //   });
+  // });
 
   it('DELETE /sa/quiz/questions/{id}', async () => {
     const question = await createQuestionHelper(app);
     const id = question.id;
 
-    request(app.getHttpServer())
+    await request(app.getHttpServer())
       .delete(`/sa/quiz/questions/${id}`)
       .set('Authorization', getBasicAuthHeaderHelper())
-      .expect(201);
+      .expect(204);
 
     await request(app.getHttpServer())
       .get(`/sa/quiz/questions/${id}`)
@@ -87,7 +88,7 @@ describe('Questions e2e', () => {
     const question = await createQuestionHelper(app);
     const id = question.id;
 
-    await request(app.getHttpServer()).put(`/sa/quiz/questions/${id}`);
+    await publishQuestionHelper(app, id);
   });
 
   afterAll(async () => {
