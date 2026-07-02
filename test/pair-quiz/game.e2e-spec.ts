@@ -42,16 +42,17 @@ describe('Game e2e', () => {
       password: password1,
       email: email1,
     });
+    token1 = await loginHelper(app, login1, password1);
 
     createUserHelper(app, {
       login: login2,
       password: password2,
       email: email2,
     });
+    token2 = await loginHelper(app, login2, password2);
+
     const questions = await createQuestionsHelper(app);
     publishQuestionsHelper(app, questions);
-    token1 = await loginHelper(app, login1, password1);
-    token2 = await loginHelper(app, login2, password2);
 
     // Connect to the game
     const connect1 = await connectToGameHelper(app, token1);
