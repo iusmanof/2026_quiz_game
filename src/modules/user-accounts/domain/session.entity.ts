@@ -11,6 +11,7 @@ export class SessionEntity {
   })
   @JoinColumn({ name: 'userId' })
   user: User;
+  // ??
 
   @Column('uuid')
   userId: string;
