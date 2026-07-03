@@ -47,9 +47,7 @@ class PairGameQuizController {
   @UseGuards(JwtAuthGuard)
   @Get('users/my-statistic')
   @HttpCode(HttpStatus.OK)
-  async getCurrentUserStatistic(
-    @Req() req: AuthenticatedRequest,
-  ): Promise<IGameStatistic> {
+  async getCurrentUserStatistic(@Req() req: AuthenticatedRequest): Promise<IGameStatistic> {
     const userId = req.user.id;
     return this.queryBus.execute(new GetCurrentUserStatisticQuery(userId));
   }
