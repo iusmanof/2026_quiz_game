@@ -23,6 +23,7 @@ import { GameViewDto } from '@modules/pair-quiz/game/api/dto/game.view-dto';
 import { AnswerResponseDto } from '@modules/pair-quiz/game/api/dto/answer-response.dto';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { CurrentUnfinishedUserGameDto } from '@modules/pair-quiz/game/api/dto/current-unfinished-user-game.dto';
+import { IGameStatistic } from '@modules/pair-quiz/game/api/dto/game-statistic.dto';
 
 @Controller('pair-game-quiz')
 class PairGameQuizController {
@@ -43,10 +44,14 @@ class PairGameQuizController {
     return this.queryBus.execute(new GetCurrentGamesQuery());
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('users/my-statistic')
   @HttpCode(HttpStatus.OK)
-  async getCurrentUserStatistic(): Promise<CurrentUnfinishedUserGameDto> {
-    return this.queryBus.execute(new GetCurrentUserStatisticQuery());
+  async getCurrentUserStatistic(
+    @Req() req: AuthenticatedRequest,
+  ): Promise<IGameStatistic> {
+    const userId = req.user.id;
+    return this.queryBus.execute(new GetCurrentUserStatisticQuery(userId));
   }
 
   @UseGuards(JwtAuthGuard)

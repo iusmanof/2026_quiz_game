@@ -42,7 +42,8 @@ export class SendAnswerForNextUseCase implements ICommandHandler<SendAnswerForNe
     }
 
     const result = game.answerQuestion(playerProgress, nextQuestion, command.answer);
-
+ // if finishes ave statistic !!!
+    console.log(result)
     console.log({
       gameId: game.id,
       status: game.status,
