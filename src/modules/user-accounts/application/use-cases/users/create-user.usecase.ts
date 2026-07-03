@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserDto } from '../../../api/dto/create-user.dto';
-import { CryptoService } from '../../crypto.service';
+import { CryptoService } from '../../services/crypto.service';
 import UsersRepository from '../../../infrastructure/users.repository';
 import { UserViewDto } from '../../../api/dto/user-view.dto';
+import { UsersEntity } from '@user-accounts/domain/users.entity';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -22,8 +23,8 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand, Use
       email: command.dto.email,
       passwordHash: passwordHash,
     };
-
-    const entity = await this.usersRepository.create(createUser);
-    return UserViewDto.mapToView(entity);
+    const userEntity = UsersEntity.create(createUser);
+    const savedUserEntity = await this.usersRepository.save(userEntity);
+    return UserViewDto.mapToView(savedUserEntity);
   }
 }

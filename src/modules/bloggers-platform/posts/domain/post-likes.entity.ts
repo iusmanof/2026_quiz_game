@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { PostsEntity } from '@modules/bloggers-platform/posts/domain/post.entity';
-import { User } from '@user-accounts/domain/user';
+import { UsersEntity } from '@user-accounts/domain/users.entity';
 import type { LikeStatus } from '@modules/bloggers-platform/posts/types/like-status.type';
 
+@Index(['userId', 'postId'])
 @Entity('PostLikes')
 export class PostLikesEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -18,13 +19,29 @@ export class PostLikesEntity {
   @Column({ type: 'uuid' })
   userId: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => UsersEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: UsersEntity;
 
-  @Column({ type: 'varchar' })
+  @Column({
+    type: 'enum',
+    enum: ['Like', 'Dislike', 'None'],
+  })
   status: LikeStatus;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   addedAt: Date;
+
+  static create(userId: string, postId: string, status: LikeStatus) {
+    const like = new PostLikesEntity();
+    like.userId = userId;
+    like.postId = postId;
+    like.status = status;
+    like.addedAt = new Date();
+    return like;
+  }
+
+  changeStatus(status: LikeStatus) {
+    this.status = status;
+  }
 }

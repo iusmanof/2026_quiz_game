@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '@user-accounts/domain/user';
 import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
+import { UsersEntity } from '@user-accounts/domain/users.entity';
 
 @Entity('PlayerProgress')
 export class PlayerProgress {
@@ -12,11 +12,11 @@ export class PlayerProgress {
   })
   score: number;
 
-  @ManyToOne(() => User, {
+  @ManyToOne(() => UsersEntity, {
     eager: true,
     onDelete: 'CASCADE',
   })
-  playerAccount: User;
+  playerAccount: UsersEntity;
 
   @OneToMany(() => PlayerAnswer, (answer) => answer.playerProgress, {
     cascade: true,

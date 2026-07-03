@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import UserController from './api/controllers/users.controller';
-import { CryptoService } from './application/crypto.service';
+import { CryptoService } from './application/services/crypto.service';
 import { GetUsersQueryHandler } from './application/queries/users/get-users.query-handler';
 import { CreateUserUseCase } from './application/use-cases/users/create-user.usecase';
 import { DeleteUserUseCase } from './application/use-cases/users/delete-user.usecase';
@@ -8,14 +8,14 @@ import { UsersQueryRepository } from './infrastructure/users.query-repository';
 import UsersRepository from './infrastructure/users.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './domain/user';
+import { UsersEntity } from './domain/users.entity';
 import { AuthController } from './api/controllers/auth.controller';
 import { NotificationModule } from '../notification/notification.module';
 import { PassportModule } from '@nestjs/passport';
 import { BasicStrategy } from './guards/basic/basic.strategy';
 import { SessionEntity } from './domain/session.entity';
 import { LocalStrategy } from './guards/local/local.strategy';
-import { ValidateUserService } from './application/validate-user.service';
+import { ValidateUserService } from './application/services/validate-user.service';
 import { LoginUseCase } from './application/use-cases/auth/login.usecase';
 import {
   ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
@@ -27,7 +27,7 @@ import { UserAccountsConfig } from './config/user-accounts.config';
 import { JwtService } from '@nestjs/jwt';
 import { UserEmailConfirmationEntity } from './domain/user-email-confirmation.entity';
 import { RegisterUserUseCase } from './application/use-cases/auth/register-user.usecase';
-import { CodeGeneratorService } from './application/code-generator.service';
+import { CodeGeneratorService } from './application/services/code-generator.service';
 import { RefreshSessionUseCase } from './application/use-cases/auth/refresh-session.usecase';
 import { LogoutUseCase } from './application/use-cases/auth/logout.usecase';
 import { JwtStrategy } from './guards/bearer/jwt.stategy';
@@ -40,6 +40,8 @@ import { GetDevicesQueryHandler } from './application/queries/users/get-devices.
 import { DeleteDeviceUseCase } from './application/use-cases/auth/delete-device.command';
 import { SecurityDevicesController } from './api/controllers/security-devices.controller';
 import { DeleteAllDevicesUseCase } from './application/use-cases/auth/delete-all-devices.useacse';
+import CommentsRepository from '@modules/bloggers-platform/comments/infrastructire/comment.repository';
+import SessionQueryRepository from '@user-accounts/infrastructure/session-query.repository';
 
 const controllers = [UserController, AuthController, SecurityDevicesController];
 const services = [CryptoService, ValidateUserService, CodeGeneratorService];
@@ -48,6 +50,8 @@ const repositories = [
   UsersRepository,
   SessionRepository,
   EmailConfirmationRepository,
+  CommentsRepository,
+  SessionQueryRepository,
 ];
 const strategies = [BasicStrategy, LocalStrategy, JwtStrategy];
 const useCases = [
@@ -69,7 +73,7 @@ const handlers = [GetUsersQueryHandler, GetUserByIdQueryHandler, GetDevicesQuery
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([UsersEntity]),
     TypeOrmModule.forFeature([SessionEntity]),
     TypeOrmModule.forFeature([UserEmailConfirmationEntity]),
     PassportModule,

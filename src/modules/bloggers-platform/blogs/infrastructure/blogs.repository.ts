@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBlogDto } from '../api/dto/create-blog.dto';
 import { BlogsEntity } from '@modules/bloggers-platform/blogs/domain/blogs.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { UpdateBlogDto } from '@modules/bloggers-platform/blogs/api/dto/update-blog.dto';
+import { PostsEntity } from '@modules/bloggers-platform/posts/domain/post.entity';
 
 @Injectable()
 class BlogsRepository {
@@ -12,29 +11,24 @@ class BlogsRepository {
     protected dataSource: DataSource,
   ) {}
 
-  async create(dto: CreateBlogDto): Promise<BlogsEntity> {
-    const query = `INSERT INTO "Blogs"( "name", "description", "websiteUrl") VALUES($1, $2, $3) RETURNING *`;
-    const values = [dto.name, dto.description, dto.websiteUrl];
-    const result: BlogsEntity[] = await this.dataSource.query(query, values);
-    return result[0];
+  async save(blog: BlogsEntity): Promise<BlogsEntity> {
+    return await this.dataSource.getRepository(BlogsEntity).save(blog);
   }
 
-  async update(id: string, dto: UpdateBlogDto): Promise<boolean> {
-    const query = `UPDATE "Blogs" SET "name" = $2, "description" = $3, "websiteUrl" = $4 WHERE "id" = $1 RETURNING "id"`;
-    const values = [id, dto.name, dto.description, dto.websiteUrl];
-    const result: [{ id: string }][] = await this.dataSource.query(query, values);
-    return result[0].length > 0;
+  async findById(id: string): Promise<BlogsEntity | null> {
+    return await this.dataSource.getRepository(BlogsEntity).findOne({ where: { id: id } });
   }
 
-  async delete(id: string): Promise<boolean> {
-    const query = `DELETE FROM "Blogs" WHERE "id" = $1 RETURNING "id"`;
-    const values = [id];
-    const result: [{ id: string }][] = await this.dataSource.query(query, values);
-    return result[0].length > 0;
+  async ensureCanDelete(id: string): Promise<number> {
+    return await this.dataSource.getRepository(PostsEntity).count({ where: { blogId: id } });
   }
+
+  async remove(id: string): Promise<void> {
+    await this.dataSource.getRepository(BlogsEntity).delete({ id: id });
+  }
+
   async deleteAll() {
-    const query = `DELETE FROM "Blogs" `;
-    await this.dataSource.query(query);
+    await this.dataSource.createQueryBuilder().delete().from('Blogs').execute();
   }
 }
 

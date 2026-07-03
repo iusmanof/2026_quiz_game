@@ -1,7 +1,7 @@
 import { createUserHelper } from '../helpers/create-user.helper';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
+import { AppModule } from '../../../2026_quiz_game/src/app.module';
 import request from 'supertest';
 import { loginHelper } from '../helpers/login.helper';
 import { connectToGameHelper } from '../helpers/connect-to-game.helper';
@@ -37,14 +37,14 @@ describe('Game e2e', () => {
   });
 
   it('should add answers and return current game after each answer', async () => {
-    createUserHelper(app, {
+    await createUserHelper(app, {
       login: login1,
       password: password1,
       email: email1,
     });
     token1 = await loginHelper(app, login1, password1);
 
-    createUserHelper(app, {
+    await createUserHelper(app, {
       login: login2,
       password: password2,
       email: email2,
@@ -52,7 +52,7 @@ describe('Game e2e', () => {
     token2 = await loginHelper(app, login2, password2);
 
     const questions = await createQuestionsHelper(app);
-    publishQuestionsHelper(app, questions);
+    await publishQuestionsHelper(app, questions);
 
     // Connect to the game
     const connect1 = await connectToGameHelper(app, token1);

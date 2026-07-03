@@ -12,14 +12,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { CreateQuestionCommand } from '../../../questions/application/commands/create-question.command-handler';
-import { UpdateQuestionCommand } from '../../../questions/application/commands/update-question.command-handler';
-import { DeleteQuestionCommand } from '../../../questions/application/commands/delete-question.command-handler';
-import { PublishQuestionCommand } from '../../../questions/application/commands/publish-question.command-handler';
-import { GetAllQuestionsQuery } from '../../../questions/application/queries/get-all-questions.query-handler';
+import { CreateQuestionCommand } from '../../application/commands/create-question.command-handler';
+import { UpdateQuestionCommand } from '../../application/commands/update-question.command-handler';
+import { DeleteQuestionCommand } from '../../application/commands/delete-question.command-handler';
+import { PublishQuestionCommand } from '../../application/commands/publish-question.command-handler';
+import { GetAllQuestionsQuery } from '../../application/queries/get-all-questions.query-handler';
 import { QueryParamsDto } from '@modules/pair-quiz/questions/api/dto/query-params.dto';
 import { CreateQuestionDto } from '@modules/pair-quiz/questions/api/dto/create-question.dto';
-import { PaginatedViewDto } from '@core/dto/paginated-view.dto';
 import { QuestionViewDto } from '@modules/pair-quiz/questions/application/queries/dto/question-view.dto';
 import {
   ApiNoContentResponse,
@@ -29,6 +28,7 @@ import {
 import { UpdateQuestionDto } from '@modules/pair-quiz/questions/api/dto/update-question.dto';
 import { PublishedQuestionDto } from '@modules/pair-quiz/questions/api/dto/published-question.dto';
 import { BasicAuthGuard } from '@user-accounts/guards/basic/basic.guard';
+import { PaginatedViewDto } from '@core/dto/paginated-view.dto';
 
 @UseGuards(BasicAuthGuard)
 @Controller('/sa/quiz/')

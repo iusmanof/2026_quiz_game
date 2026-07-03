@@ -6,7 +6,6 @@ import { UsersQueryRepository } from '../../infrastructure/users.query-repositor
 import { UserContextDto } from '../../dto/user-context.dto';
 import { DomainException } from '@core/exceptions/filters/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/filters/domain-exception-codes';
-import { User } from '../../domain/user';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -22,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: UserContextDto): Promise<UserContextDto> {
-    const user: User | null = await this.usersQueryRepository.findById(payload.id);
+    const user = await this.usersQueryRepository.findById(payload.id);
 
     if (!user) {
       throw new DomainException({
@@ -33,7 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     return {
-      id: user.id.toString(),
+      id: user.userId.toString(),
       login: user.login,
     };
   }

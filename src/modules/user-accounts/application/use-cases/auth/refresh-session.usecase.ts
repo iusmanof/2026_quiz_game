@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import bcrypt from 'bcrypt';
 import {
   ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
@@ -14,7 +13,7 @@ import { DomainException } from '@core/exceptions/filters/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/filters/domain-exception-codes';
 
 export class RefreshSessionCommand {
-  constructor(public readonly refreshToken: string) {}
+  constructor(public readonly refreshToken: string | undefined) {}
 }
 
 @CommandHandler(RefreshSessionCommand)
@@ -32,9 +31,7 @@ export class RefreshSessionUseCase implements ICommandHandler<RefreshSessionComm
   ) {}
 
   async execute(command: RefreshSessionCommand): Promise<RefreshSession> {
-    const { refreshToken } = command;
-
-    if (!refreshToken) {
+    if (!command.refreshToken) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
         message: 'Refresh token not found',
@@ -43,7 +40,7 @@ export class RefreshSessionUseCase implements ICommandHandler<RefreshSessionComm
 
     let payload: { deviceId: string; userId: string };
     try {
-      payload = this.refreshJwt.verify(refreshToken, {
+      payload = this.refreshJwt.verify(command.refreshToken, {
         secret: this.config.refreshTokenSecret,
       });
     } catch {
@@ -55,68 +52,60 @@ export class RefreshSessionUseCase implements ICommandHandler<RefreshSessionComm
 
     const session = await this.sessionRepository.findByDeviceId(payload.deviceId);
 
-    if (!session || session.userId !== payload.userId) {
+    if (!session) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
         message: 'Session not found',
       });
     }
 
-    if (session.expiresAt < new Date()) {
+    session?.assertOwnership(payload.userId);
+
+    const decoded = this.refreshJwt.decode<{ iat: number; exp: number }>(command.refreshToken);
+
+    if (
+      !decoded?.iat ||
+      !decoded?.exp ||
+      session.isRefreshTokenUsed(new Date(decoded.iat * 1000))
+    ) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
-        message: 'Session expired',
-      });
-    }
-
-    if (session.isRevoked) {
-      throw new DomainException({
-        code: DomainExceptionCode.Unauthorized,
-        message: 'Token revoked',
-      });
-    }
-
-    const decoded = this.refreshJwt.decode<{ iat: number }>(refreshToken);
-
-    if (!decoded?.iat) {
-      throw new DomainException({
-        code: DomainExceptionCode.Unauthorized,
-        message: 'Invalid refresh token payload',
-      });
-    }
-
-    const tokenIatDate = new Date(decoded.iat * 1000);
-
-    if (session.lastActiveDate.toISOString() !== tokenIatDate.toISOString()) {
-      throw new DomainException({
-        code: DomainExceptionCode.Unauthorized,
-        message: 'Refresh token already used',
+        message: 'Refresh token already used or invalid',
       });
     }
 
     const user = await this.usersQueryRepository.findById(session.userId);
+    if (!user) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'User not found',
+      });
+    }
 
-    const newRefreshToken = this.refreshJwt.sign({
-      userId: user!.id,
+    const iatDate = new Date(decoded.iat * 1000);
+    const expDate = new Date(decoded.exp * 1000);
+
+    const newRefreshToken: string = this.refreshJwt.sign({
+      userId: user.userId,
       deviceId: session.deviceId,
     });
+    const newDecoded: { iat: number; exp: number } = this.refreshJwt.decode(newRefreshToken);
 
-    const newHash = await bcrypt.hash(newRefreshToken, 10);
+    const newIat = new Date(newDecoded.iat * 1000);
+    const newExp = new Date(newDecoded.exp * 1000);
 
-    const decodedNew: { iat: number; exp: number } = this.refreshJwt.decode(newRefreshToken);
+    await session.useRefreshToken({
+      oldRefreshToken: command.refreshToken,
+      newRefreshToken: newRefreshToken,
+      iat: iatDate,
+      exp: expDate,
+      newIat: newIat,
+      newExp: newExp,
+    });
 
-    const lastActiveDate = new Date(decodedNew.iat * 1000);
-    const expiresAt = new Date(decodedNew.exp * 1000);
+    await this.sessionRepository.save(session);
 
-    const accessToken = this.accessJwt.sign({ id: user!.id });
-
-    await this.sessionRepository.useRefreshToken(
-      session.deviceId,
-      refreshToken,
-      newHash,
-      lastActiveDate,
-      expiresAt,
-    );
+    const accessToken = this.accessJwt.sign({ id: payload.deviceId });
 
     return { accessToken, newRefreshToken };
   }

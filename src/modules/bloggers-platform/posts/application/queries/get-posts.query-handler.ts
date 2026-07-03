@@ -16,24 +16,10 @@ export class GetPostQueryHandler implements IQueryHandler<GetPostQuery> {
   constructor(private readonly postsQueryRepository: PostsQueryRepository) {}
 
   async execute(query: GetPostQuery): Promise<PostPaginatedViewDto<PostViewDto>> {
-    const { items, totalCount } = await this.postsQueryRepository.getAll(query.queryParams);
-
-    // items.forEach((post) => post.computeExtendedLikesInfo(query.userId));
-    //
-    // computeExtendedLikesInfo(currentUserId?: string) {
-    //   const extended = this.extendedLikesInfo;
-    //   extended.myStatus = 'None';
-    //
-    //   if (!currentUserId) return;
-    //
-    //   const reaction = extended.newestLikes.find(
-    //     (r) => r.userId === currentUserId,
-    //   );
-    //
-    //   if (reaction) {
-    //     extended.myStatus = reaction.status;
-    //   }
-    // }
+    const { items, totalCount } = await this.postsQueryRepository.getAll(
+      query.queryParams,
+      query.userId,
+    );
 
     return PostPaginatedViewDto.mapToView({
       items: items.map(PostViewDto.mapToView),

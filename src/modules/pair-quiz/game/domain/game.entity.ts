@@ -9,9 +9,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
-import { User } from '@user-accounts/domain/user';
 import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
 import { AnswerStatus, PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
+import { UsersEntity } from '@user-accounts/domain/users.entity';
 
 export enum GameStatus {
   PendingSecondPlayer = 'PendingSecondPlayer',
@@ -61,7 +61,7 @@ export class Game {
   @Column({ type: 'timestamp', nullable: true })
   finishGameDate: Date | null;
 
-  static createPendingGame(user: User): Game {
+  static createPendingGame(user: UsersEntity): Game {
     const game = new Game();
 
     const firstPlayerProgress = new PlayerProgress();
@@ -81,7 +81,7 @@ export class Game {
     return game;
   }
 
-  connectSecondPlayer(user: User): void {
+  connectSecondPlayer(user: UsersEntity): void {
     const secondPlayerProgress = new PlayerProgress();
 
     secondPlayerProgress.playerAccount = user;

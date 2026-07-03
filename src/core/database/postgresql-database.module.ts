@@ -19,7 +19,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         database: configService.get<string>('DB_NAME', 'pg-db'),
         autoLoadEntities: true,
         synchronize: true,
-        logging: false,
+        logging: true,
       }),
     }),
   ],

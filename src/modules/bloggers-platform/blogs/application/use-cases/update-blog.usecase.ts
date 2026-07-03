@@ -1,8 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UpdateBlogDto } from '../../api/dto/update-blog.dto';
+import { UpdateBlogDto } from '../../api/dto/input/update-blog.dto';
 import BlogsRepository from '../../infrastructure/blogs.repository';
-import BlogsQueryRepository from '../../infrastructure/blogs.query-repository';
-import { DomainException } from '@core/exceptions/filters/domain-exceptions';
+import { DomainException, Extension } from '@core/exceptions/filters/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/filters/domain-exception-codes';
 
 export class UpdateBlogCommand {
@@ -14,20 +13,20 @@ export class UpdateBlogCommand {
 
 @CommandHandler(UpdateBlogCommand)
 export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand, void> {
-  constructor(
-    private readonly blogsQueryRepository: BlogsQueryRepository,
-    private readonly blogsRepository: BlogsRepository,
-  ) {}
+  constructor(private readonly blogsRepository: BlogsRepository) {}
 
   async execute({ id, dto }: UpdateBlogCommand): Promise<void> {
-    const entity = await this.blogsRepository.update(id, dto);
+    const blog = await this.blogsRepository.findById(id);
 
-    if (!entity) {
+    if (!blog) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
         message: 'Blog not found',
-        extensions: [{ field: 'blog', message: 'Blog not found' }],
+        extensions: [new Extension('Blog with given id does not exist', 'id')],
       });
     }
+
+    blog.changeDetails(dto);
+    await this.blogsRepository.save(blog);
   }
 }

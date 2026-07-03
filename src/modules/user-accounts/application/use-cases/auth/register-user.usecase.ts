@@ -2,12 +2,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersQueryRepository } from '../../../infrastructure/users.query-repository';
 import UsersRepository from '../../../infrastructure/users.repository';
 import { RegistrationUserInputDto } from '../../../api/dto/registation-user.dto';
-import { CryptoService } from '../../crypto.service';
+import { CryptoService } from '../../services/crypto.service';
 import { DomainException } from '@core/exceptions/filters/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/filters/domain-exception-codes';
-import { CodeGeneratorService } from '../../code-generator.service';
+import { CodeGeneratorService } from '../../services/code-generator.service';
 import { EmailService } from '@modules/notification/email.service';
 import EmailConfirmationRepository from '../../../infrastructure/email-confirmation.repository';
+import { UsersEntity } from '@user-accounts/domain/users.entity';
 
 export class RegisterUserCommand {
   constructor(public body: RegistrationUserInputDto) {}
@@ -43,28 +44,24 @@ export class RegisterUserUseCase implements ICommandHandler<RegisterUserCommand>
     }
 
     const confirmCode = this.codeGeneratorService.generateNumericCode(4);
-
     const passwordHash = await this.cryptoService.createPasswordHash(command.body.password);
 
-    const user = await this.usersRepository.create({
+    const { usersEntity, confirmation } = UsersEntity.createWithConfirmation({
       login: command.body.login,
       email: command.body.email,
-      passwordHash,
+      passwordHash: passwordHash,
+      confirmationCode: confirmCode,
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60),
     });
 
-    // TODO find all code connected with expiresAt and through put in service
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 60);
+    const savedUser = await this.usersRepository.save(usersEntity);
+
     await this.emailConfirmationRepository.create({
-      userId: user.id,
-      code: confirmCode,
-      expiresAt,
+      userId: savedUser.getId(),
+      code: confirmation.code,
+      expiresAt: confirmation.expiresAt,
     });
 
-    // TODO use DDD
-    // createdUser.setConfirmationCode(confirmCode);
-    //
-    // await this.usersRepository.save(createdUser);
-    // TODO send message
     await this.emailService.sendConfirmationEmail(command.body.email, confirmCode);
   }
 }

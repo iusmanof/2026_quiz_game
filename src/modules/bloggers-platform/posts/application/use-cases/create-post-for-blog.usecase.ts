@@ -2,8 +2,12 @@ import { ICommandHandler, CommandHandler } from '@nestjs/cqrs';
 import { CreatePostForBlogDto } from '../../api/dto/create-post-for-blog.dto';
 import PostsRepository from '../../infrastructure/posts.repository';
 
-import { PostsEntityWithBlogRowAndExtendedLikes, PostViewDto } from '../../api/dto/post-view.dto';
-import BlogsQueryRepository from '@modules/bloggers-platform/blogs/infrastructure/blogs.query-repository';
+import { PostViewDto } from '../../api/dto/post-view.dto';
+import { DomainException } from '@core/exceptions/filters/domain-exceptions';
+import { DomainExceptionCode } from '@core/exceptions/filters/domain-exception-codes';
+import BlogsRepository from '@modules/bloggers-platform/blogs/infrastructure/blogs.repository';
+import { PostsEntity } from '@modules/bloggers-platform/posts/domain/post.entity';
+import { LikeStatus } from '@modules/bloggers-platform/posts/types/like-status.type';
 
 export class CreatePostForBlogCommand {
   constructor(
@@ -19,17 +23,31 @@ export class CreatePostForBlogUseCase implements ICommandHandler<
 > {
   constructor(
     private readonly postsRepository: PostsRepository,
-    private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
 
   async execute(command: CreatePostForBlogCommand): Promise<PostViewDto> {
-    const { blogId, dto } = command;
-    await this.blogsQueryRepository.findOrNotFoundFail(blogId);
+    const blog = await this.blogsRepository.findById(command.blogId);
+    if (!blog) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Blog not found',
+      });
+    }
+    const blogId = blog.getId();
 
-    const post = await this.postsRepository.create({
-      ...dto,
-      blogId,
-    });
-    return PostViewDto.mapToView(post as PostsEntityWithBlogRowAndExtendedLikes);
+    const postEntity = PostsEntity.createPostForBlog({ dto: command.dto, blogId: blogId });
+    const post = await this.postsRepository.save(postEntity);
+
+    post.changeDetails(command.dto);
+    const postDTO = {
+      ...post,
+      blogName: blog.getName(),
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: 'None' as LikeStatus,
+      newestLikes: [],
+    };
+    return PostViewDto.mapToView(postDTO);
   }
 }
