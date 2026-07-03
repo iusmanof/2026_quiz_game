@@ -1,6 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import GameRepository from '@modules/pair-quiz/game/infrastructure/game.repository';
-import { Game } from '@modules/pair-quiz/game/domain/game.entity';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import UsersRepository from '@user-accounts/infrastructure/users.repository';
 import { GameMapper } from '@modules/pair-quiz/game/api/mappers/game.mapper';
@@ -34,15 +33,26 @@ export class ConnectCurrentUserUseCase implements ICommandHandler<ConnectCurrent
 
     if (pendingGame) {
       const questions = await this.questionRepository.getRandomPublishedQuestions(5);
+
+      console.log('Questions count:', questions.length);
+
       pendingGame.connectSecondPlayer(user);
+      console.log('Second player connected');
+
       pendingGame.assignQuestions(questions);
+      console.log('Questions assigned');
+
+      console.log('Game before save:', {
+        status: pendingGame.status,
+        firstPlayerId: pendingGame.firstPlayerProgress.playerAccount.id,
+        secondPlayerId: pendingGame.secondPlayerProgress?.playerAccount.id,
+        questions: pendingGame.questions?.length,
+      });
+
       await this.gameRepository.save(pendingGame);
 
+      console.log('Game saved');
       return GameMapper.toView(pendingGame);
     }
-
-    const game = Game.createPendingGame(user);
-    await this.gameRepository.save(game);
-    return GameMapper.toView(game);
   }
 }

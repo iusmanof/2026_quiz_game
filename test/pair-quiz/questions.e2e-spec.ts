@@ -6,7 +6,7 @@ import { getBasicAuthHeaderHelper } from '../helpers/get-basic-auth-header.helpe
 import { createQuestionHelper } from '../helpers/create-question.helper';
 import { publishQuestionHelper } from '../helpers/publish-question.helper';
 
-describe('Questions e2e', () => {
+describe('question e2e', () => {
   let app: INestApplication;
 
   beforeAll(async () => {

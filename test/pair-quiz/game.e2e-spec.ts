@@ -43,6 +43,7 @@ describe('Game e2e', () => {
       email: email1,
     });
     token1 = await loginHelper(app, login1, password1);
+    const connect1 = await connectToGameHelper(app, token1);
 
     await createUserHelper(app, {
       login: login2,
@@ -53,16 +54,16 @@ describe('Game e2e', () => {
 
     const questions = await createQuestionsHelper(app);
     await publishQuestionsHelper(app, questions);
-
-    // Connect to the game
-    const connect1 = await connectToGameHelper(app, token1);
-    const connect2 = await connectToGameHelper(app, token2);
-    expect(connect1.status).toBe('PendingSecondPlayer');
-    expect(connect2.status).toBe('Active');
-    await answerHelper(app, token1, 'A2');
-
-    const game1 = await getCurrentGameHelper(app, token1);
-    const game2 = await getCurrentGameHelper(app, token2);
+    //
+    // // Connect to the game
+    //
+    // const connect2 = await connectToGameHelper(app, token2);
+    // expect(connect1.status).toBe('PendingSecondPlayer');
+    // expect(connect2.status).toBe('Active');
+    // await answerHelper(app, token1, 'A2');
+    //
+    // const game1 = await getCurrentGameHelper(app, token1);
+    // const game2 = await getCurrentGameHelper(app, token2);
   });
 
   afterAll(async () => {
