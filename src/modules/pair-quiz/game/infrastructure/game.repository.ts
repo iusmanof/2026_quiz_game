@@ -93,6 +93,7 @@ class GameRepository {
   }
 
   async save(game: Game): Promise<Game> {
+    // await new Promise((resolve) => setTimeout(resolve, 50));
     return this.dataSource.getRepository(Game).save(game);
   }
 

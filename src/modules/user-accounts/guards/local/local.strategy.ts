@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { DomainException } from '../../../../core/exceptions/filters/domain-exceptions';
-import { DomainExceptionCode } from '../../../../core/exceptions/filters/domain-exception-codes';
+import { DomainException } from '@core/exceptions/filters/domain-exceptions';
+import { DomainExceptionCode } from '@core/exceptions/filters/domain-exception-codes';
 import { ValidateUserService } from '../../application/validate-user.service';
 
 @Injectable()
@@ -15,7 +15,10 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   }
 
   async validate(loginOrEmail: string, password: string) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const user = await this.validateUserService.validate(loginOrEmail, password);
+
     if (!user) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,

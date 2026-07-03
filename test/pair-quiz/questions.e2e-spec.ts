@@ -5,6 +5,7 @@ import request from 'supertest';
 import { getBasicAuthHeaderHelper } from '../helpers/get-basic-auth-header.helper';
 import { createQuestionHelper } from '../helpers/create-question.helper';
 import { publishQuestionHelper } from '../helpers/publish-question.helper';
+import { afterEach } from 'node:test';
 
 describe('Questions e2e', () => {
   let app: INestApplication;
@@ -89,6 +90,10 @@ describe('Questions e2e', () => {
     const id = question.id;
 
     await publishQuestionHelper(app, id);
+  });
+
+  afterEach(async () => {
+    await request(app.getHttpServer()).delete('/testing/all-data').expect(204);
   });
 
   afterAll(async () => {
