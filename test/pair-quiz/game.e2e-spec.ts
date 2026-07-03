@@ -37,14 +37,14 @@ describe('Game e2e', () => {
   });
 
   it('should add answers and return current game after each answer', async () => {
-    createUserHelper(app, {
+    await createUserHelper(app, {
       login: login1,
       password: password1,
       email: email1,
     });
     token1 = await loginHelper(app, login1, password1);
 
-    createUserHelper(app, {
+    await createUserHelper(app, {
       login: login2,
       password: password2,
       email: email2,
@@ -52,7 +52,7 @@ describe('Game e2e', () => {
     token2 = await loginHelper(app, login2, password2);
 
     const questions = await createQuestionsHelper(app);
-    publishQuestionsHelper(app, questions);
+    await publishQuestionsHelper(app, questions);
 
     // Connect to the game
     const connect1 = await connectToGameHelper(app, token1);
@@ -60,9 +60,16 @@ describe('Game e2e', () => {
     expect(connect1.status).toBe('PendingSecondPlayer');
     expect(connect2.status).toBe('Active');
     await answerHelper(app, token1, 'A2');
+    await answerHelper(app, token2, 'A2');
+    await answerHelper(app, token1, 'A2');
+    await answerHelper(app, token2, 'A3');
+    await answerHelper(app, token1, 'A3');
+    await answerHelper(app, token2, 'A2');
 
     const game1 = await getCurrentGameHelper(app, token1);
     const game2 = await getCurrentGameHelper(app, token2);
+    console.log(game1);
+    console.log(game2);
   });
 
   afterAll(async () => {
