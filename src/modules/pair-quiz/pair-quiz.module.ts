@@ -24,6 +24,7 @@ import GameRepository from '@modules/pair-quiz/game/infrastructure/game.reposito
 import { UserAccountsModule } from '@user-accounts/user-accounts.module';
 import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
 import GameQueryRepository from '@modules/pair-quiz/game/infrastructure/game.query-repository';
+import { GameStatistic } from '@modules/pair-quiz/game/domain/game-statistic.entity';
 
 const controllers = [PairGameQuizController, QuestionsController];
 const repositories = [
@@ -54,7 +55,7 @@ const exportsRepo = [QuestionRepository, GameRepository];
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([PlayerProgress, Game, Question, PlayerAnswer]),
+    TypeOrmModule.forFeature([PlayerProgress, Game, Question, PlayerAnswer, GameStatistic]),
     UserAccountsModule,
   ],
   controllers: [...controllers],
