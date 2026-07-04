@@ -10,6 +10,7 @@ import { publishQuestionsHelper } from '../helpers/publish-question.helper';
 import { answerHelper } from '../helpers/answer.helper';
 import { getCurrentGameHelper } from '../helpers/get-current-game.helper';
 import { getGameByIdHelper } from '../helpers/getGameById.helper';
+import { currentUserStatisticHelper } from '../helpers/current-user-statistic.helper';
 
 describe('Game e2e', () => {
   let app: INestApplication;
@@ -85,10 +86,15 @@ describe('Game e2e', () => {
     await answerHelper(app, token2, 'A2');
 
     const fullGame = await getGameByIdHelper(app, token1, gameId);
-    console.log(fullGame);
     expect(fullGame.status).toBe('Finished');
 
-
+    const stat = await currentUserStatisticHelper(app, token1);
+    expect(stat.gamesCount).toBe(1);
+    expect(stat.sumScore).toBeGreaterThanOrEqual(0);
+    expect(stat.avgScores).toBe(stat.sumScore);
+    expect(
+      stat.winsCount + stat.lossesCount + stat.drawsCount,
+    ).toBe(1);
   });
 
   afterAll(async () => {

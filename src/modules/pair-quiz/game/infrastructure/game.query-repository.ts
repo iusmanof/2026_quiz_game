@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { Game, GameStatus } from '@modules/pair-quiz/game/domain/game.entity';
+import { Game } from '@modules/pair-quiz/game/domain/entites/game.entity';
+import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enum';
 
 @Injectable()
 class GameQueryRepository {

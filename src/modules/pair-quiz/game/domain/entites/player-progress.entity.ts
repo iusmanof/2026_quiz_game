@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '@user-accounts/domain/user';
-import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
+import { PlayerAnswer } from '@modules/pair-quiz/game/domain/entites/player-answer.entity';
 
 @Entity('PlayerProgress')
 export class PlayerProgress {

@@ -1,4 +1,4 @@
-import { AnswerStatus } from '@modules/pair-quiz/game/domain/player-answer.entity';
+import { AnswerStatus } from '@modules/pair-quiz/game/domain/entites/player-answer.entity';
 
 interface IAnswer {
   questionId: string;

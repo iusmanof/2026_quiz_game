@@ -1,5 +1,6 @@
-import { Game, GameStatus } from '@modules/pair-quiz/game/domain/game.entity';
+import { Game } from '@modules/pair-quiz/game/domain/entites/game.entity';
 import { GameViewDto } from '@modules/pair-quiz/game/api/dto/game.view-dto';
+import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enum';
 
 export class GameMapper {
   static toView(game: Game): GameViewDto {

@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { SessionEntity } from './session.entity';
 import { UserEmailConfirmationEntity } from './user-email-confirmation.entity';
-import {PlayerProgress} from "@modules/pair-quiz/game/domain/player-progress.entity";
+import {PlayerProgress} from "@modules/pair-quiz/game/domain/entites/player-progress.entity";
 
 @Entity({ name: 'Users' })
 export class User {

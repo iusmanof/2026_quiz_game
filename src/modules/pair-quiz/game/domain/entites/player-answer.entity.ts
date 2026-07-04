@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
+import { PlayerProgress } from '@modules/pair-quiz/game/domain/entites/player-progress.entity';
 
 export enum AnswerStatus {
   Correct = 'Correct',

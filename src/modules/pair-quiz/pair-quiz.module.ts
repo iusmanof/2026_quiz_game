@@ -8,10 +8,10 @@ import { GetCurrentUserStatisticQueryHandler } from '@modules/pair-quiz/game/app
 import { GetCurrentUnfinishedUserGameQueryHandler } from '@modules/pair-quiz/game/application/queries/get-current-unfinished-user-game.query-handler';
 import { GetGameByIdQueryHandler } from '@modules/pair-quiz/game/application/queries/get-game-by-id.query-handler';
 import { ConnectCurrentUserUseCase } from '@modules/pair-quiz/game/application/commands/connect-current-user.command-handler';
-import { SendAnswerForNextUseCase } from '@modules/pair-quiz/game/application/commands/send-answer-for-next.command-handler';
+import SendAnswerForNextUseCase from '@modules/pair-quiz/game/application/commands/send-answer-for-next.command-handler';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
-import { Game } from '@modules/pair-quiz/game/domain/game.entity';
+import { PlayerProgress } from '@modules/pair-quiz/game/domain/entites/player-progress.entity';
+import { Game } from '@modules/pair-quiz/game/domain/entites/game.entity';
 import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
 import { GetAllQuestionsQueryHandler } from '@modules/pair-quiz/questions/application/queries/get-all-questions.query-handler';
 import QuestionQueryRepository from '@modules/pair-quiz/questions/infrastructure/question.query-repository';
@@ -22,9 +22,12 @@ import { PublishQuestionUseCase } from '@modules/pair-quiz/questions/application
 import { UpdateQuestionUseCase } from '@modules/pair-quiz/questions/application/commands/update-question.command-handler';
 import GameRepository from '@modules/pair-quiz/game/infrastructure/game.repository';
 import { UserAccountsModule } from '@user-accounts/user-accounts.module';
-import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
+import { PlayerAnswer } from '@modules/pair-quiz/game/domain/entites/player-answer.entity';
 import GameQueryRepository from '@modules/pair-quiz/game/infrastructure/game.query-repository';
-import { GameStatistic } from '@modules/pair-quiz/game/domain/game-statistic.entity';
+import { GameStatistic } from '@modules/pair-quiz/game/domain/entites/game-statistic.entity';
+import { GameFinishedEventHandler } from '@modules/pair-quiz/game/application/event-handlers/game-finished-event.handler';
+import GameStatisticRepository from '@modules/pair-quiz/game/infrastructure/game-statistic.repository';
+import GameStatisticQueryRepository from '@modules/pair-quiz/game/infrastructure/game-statistic.query-repository';
 
 const controllers = [PairGameQuizController, QuestionsController];
 const repositories = [
@@ -32,6 +35,8 @@ const repositories = [
   QuestionRepository,
   GameRepository,
   GameQueryRepository,
+  GameStatisticRepository,
+  GameStatisticQueryRepository,
 ];
 const useCases = [
   ConnectCurrentUserUseCase,
@@ -48,6 +53,7 @@ const handlers = [
   GetCurrentUnfinishedUserGameQueryHandler,
   GetGameByIdQueryHandler,
   GetAllQuestionsQueryHandler,
+  GameFinishedEventHandler,
 ];
 const services = [];
 const exportsRepo = [QuestionRepository, GameRepository];

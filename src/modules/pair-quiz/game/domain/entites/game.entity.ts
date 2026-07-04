@@ -8,16 +8,15 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
+import { PlayerProgress } from '@modules/pair-quiz/game/domain/entites/player-progress.entity';
 import { User } from '@user-accounts/domain/user';
 import { Question } from '@modules/pair-quiz/questions/domain/question.entity';
-import { AnswerStatus, PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
-
-export enum GameStatus {
-  PendingSecondPlayer = 'PendingSecondPlayer',
-  Active = 'Active',
-  Finished = 'Finished',
-}
+import {
+  AnswerStatus,
+  PlayerAnswer,
+} from '@modules/pair-quiz/game/domain/entites/player-answer.entity';
+import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enum';
+import { GameResult } from '@modules/pair-quiz/game/domain/enums/game-result.enum';
 
 @Entity('Game')
 export class Game {
@@ -119,6 +118,7 @@ export class Game {
 
     return this.questions.find((q) => !answeredQuestionIds.has(q.id)) ?? null;
   }
+
   answerQuestion(playerProgress: PlayerProgress, question: Question, answer: string): PlayerAnswer {
     const isCorrect = question.correctAnswers.some(
       (correctAnswer) => correctAnswer.toLowerCase().trim() === answer.toLowerCase().trim(),
@@ -137,8 +137,29 @@ export class Game {
     }
 
     this.tryFinishGame();
-
     return playerAnswer;
+  }
+
+  getResultForPlayer(userId: string): GameResult {
+    if (!this.secondPlayerProgress) {
+      throw new Error('Game has no second player');
+    }
+
+    const isFirstPlayer = this.firstPlayerProgress.playerAccount.id === userId;
+
+    const player = isFirstPlayer ? this.firstPlayerProgress : this.secondPlayerProgress;
+
+    const opponent = isFirstPlayer ? this.secondPlayerProgress : this.firstPlayerProgress;
+
+    if (player.score > opponent.score) {
+      return GameResult.Win;
+    }
+
+    if (player.score < opponent.score) {
+      return GameResult.Lose;
+    }
+
+    return GameResult.Draw;
   }
 
   private tryFinishGame(): void {
@@ -174,7 +195,6 @@ export class Game {
     } else if (secondCorrect && secondLast < firstLast) {
       this.secondPlayerProgress.score += 1;
     }
-
     this.status = GameStatus.Finished;
     this.finishGameDate = new Date();
   }

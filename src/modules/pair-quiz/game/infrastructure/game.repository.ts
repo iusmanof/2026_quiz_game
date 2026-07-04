@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { Game, GameStatus } from '@modules/pair-quiz/game/domain/game.entity';
-import { PlayerProgress } from '@modules/pair-quiz/game/domain/player-progress.entity';
-import { PlayerAnswer } from '@modules/pair-quiz/game/domain/player-answer.entity';
+import { Game } from '@modules/pair-quiz/game/domain/entites/game.entity';
+import { PlayerProgress } from '@modules/pair-quiz/game/domain/entites/player-progress.entity';
+import { PlayerAnswer } from '@modules/pair-quiz/game/domain/entites/player-answer.entity';
+import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enum';
 
 @Injectable()
 class GameRepository {
@@ -24,6 +25,12 @@ class GameRepository {
     return game;
   }
 
+  async findById(gameId: string): Promise<Game | null> {
+    return await this.dataSource.getRepository(Game).findOne({
+      where: { id: gameId },
+      relations: { firstPlayerProgress: true, secondPlayerProgress: true },
+    });
+  }
   async findPending(): Promise<Game | null> {
     const game = await this.dataSource.getRepository(Game).findOne({
       where: {
