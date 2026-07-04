@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "cross-env NODE_ENV=testing jest --config ./test/jest-e2e.json --runInBand",
     "test:e2e:game": "cross-env NODE_ENV=testing jest --runInBand --detectOpenHandles --config ./test/jest-e2e.json",
-    "localtunnel": "npx localtunnel --port 5005",
+    "localtunnel": "npx localtunnel --port 5004",
     "ngrok": "npx ngrok http 5005"
   },
   "dependencies": {
