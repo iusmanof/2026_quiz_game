@@ -28,6 +28,7 @@ import { GameStatistic } from '@modules/pair-quiz/game/domain/entites/game-stati
 import { GameFinishedEventHandler } from '@modules/pair-quiz/game/application/event-handlers/game-finished-event.handler';
 import GameStatisticRepository from '@modules/pair-quiz/game/infrastructure/game-statistic.repository';
 import GameStatisticQueryRepository from '@modules/pair-quiz/game/infrastructure/game-statistic.query-repository';
+import { GameQuestion } from '@modules/pair-quiz/game/domain/entites/game-question.entity';
 
 const controllers = [PairGameQuizController, QuestionsController];
 const repositories = [
@@ -61,7 +62,7 @@ const exportsRepo = [QuestionRepository, GameRepository];
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([PlayerProgress, Game, Question, PlayerAnswer, GameStatistic]),
+    TypeOrmModule.forFeature([PlayerProgress, Game, Question, PlayerAnswer, GameStatistic, GameQuestion]),
     UserAccountsModule,
   ],
   controllers: [...controllers],

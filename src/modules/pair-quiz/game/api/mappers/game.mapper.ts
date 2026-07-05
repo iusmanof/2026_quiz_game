@@ -8,7 +8,7 @@ export class GameMapper {
       id: game.id,
 
       firstPlayerProgress: {
-        answers:  (game.firstPlayerProgress.answers ?? [])
+        answers: (game.firstPlayerProgress.answers ?? [])
           .sort((a, b) => a.addedAt.getTime() - b.addedAt.getTime())
           .map((answer) => ({
             questionId: answer.questionId,
@@ -43,13 +43,21 @@ export class GameMapper {
           }
         : null,
 
+      // game.status === GameStatus.PendingSecondPlayer
+      //   ? null
+      //   : (game.questions?.map((question) => ({
+      //       id: question.id,
+      //       body: question.body,
+      //     })) ?? null),
       questions:
         game.status === GameStatus.PendingSecondPlayer
           ? null
-          : (game.questions?.map((question) => ({
-              id: question.id,
-              body: question.body,
-            })) ?? null),
+          : (game.gameQuestions ?? [])
+            .sort((a, b) => a.order - b.order)
+            .map(gq => ({
+              id: gq.question.id,
+              body: gq.question.body,
+            })),
 
       status: game.status,
 

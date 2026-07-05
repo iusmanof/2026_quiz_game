@@ -45,7 +45,9 @@ class GameRepository {
           playerAccount: true,
           answers: true,
         },
-        questions: true,
+        gameQuestions: {
+          question: true,
+        },
       },
       order: {
         createdAt: 'ASC',
@@ -84,7 +86,9 @@ class GameRepository {
         },
       ],
       relations: {
-        questions: true,
+        gameQuestions: {
+          question: true,
+        },
         firstPlayerProgress: {
           playerAccount: true,
           answers: true,

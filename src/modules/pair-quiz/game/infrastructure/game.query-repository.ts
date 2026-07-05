@@ -21,7 +21,9 @@ class GameQueryRepository {
           playerAccount: true,
         },
         secondPlayerProgress: { answers: true, playerAccount: true },
-        questions: true,
+        gameQuestions: {
+          question: true,
+        },
       },
     });
   }
@@ -63,7 +65,9 @@ class GameQueryRepository {
           answers: true,
           playerAccount: true,
         },
-        questions: true,
+        gameQuestions: {
+          question: true,
+        },
       },
     });
   }

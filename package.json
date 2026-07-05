@@ -20,7 +20,7 @@
     "test:e2e": "cross-env NODE_ENV=testing jest --config ./test/jest-e2e.json --runInBand",
     "test:e2e:game": "cross-env NODE_ENV=testing jest --runInBand --detectOpenHandles --config ./test/jest-e2e.json",
     "localtunnel": "npx localtunnel --port 5004",
-    "ngrok": "npx ngrok http 5005"
+    "ngrok": "npx ngrok http 5004"
   },
   "dependencies": {
     "-": "^0.0.1",

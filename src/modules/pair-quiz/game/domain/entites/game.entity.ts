@@ -3,8 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -17,6 +16,7 @@ import {
 } from '@modules/pair-quiz/game/domain/entites/player-answer.entity';
 import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enum';
 import { GameResult } from '@modules/pair-quiz/game/domain/enums/game-result.enum';
+import { GameQuestion } from '@modules/pair-quiz/game/domain/entites/game-question.entity';
 
 @Entity('Game')
 export class Game {
@@ -44,9 +44,14 @@ export class Game {
   @JoinColumn()
   secondPlayerProgress: PlayerProgress | null;
 
-  @ManyToMany(() => Question)
-  @JoinTable()
-  questions: Question[] | null;
+  // @ManyToMany(() => Question)
+  // @JoinTable()
+  // questions: Question[] | null;
+  @OneToMany(() => GameQuestion, gq => gq.game, {
+    cascade: true,
+    eager: true,
+  })
+  gameQuestions: GameQuestion[];
 
   @CreateDateColumn()
   createdAt: Date;
@@ -75,7 +80,7 @@ export class Game {
 
     game.startGameDate = null;
     game.finishGameDate = null;
-    game.questions = null;
+    game.gameQuestions = [];
 
     return game;
   }
@@ -93,8 +98,29 @@ export class Game {
     this.startGameDate = new Date();
   }
 
-  assignQuestions(questions: Question[]): void {
-    this.questions = questions;
+  // assignQuestions(questions: Question[]): void {
+  //   this.questions = questions;
+  //   console.log('----------assignQuestions-----------');
+  //   console.log(this.questions);
+  //   console.log('----------assignQuestions-----------');
+  // }
+
+  assignQuestions(questions: Question[]) {
+    this.gameQuestions = questions.map((question, index) => {
+      const gq = new GameQuestion();
+
+      gq.game = this;
+      gq.question = question;
+      gq.order = index;
+
+      return gq;
+    });
+  }
+
+  private getOrderedQuestions(): Question[] {
+    return (this.gameQuestions ?? [])
+      .sort((a, b) => a.order - b.order)
+      .map(gq => gq.question);
   }
 
   getPlayerProgress(userId: string): PlayerProgress | null {
@@ -110,13 +136,26 @@ export class Game {
   }
 
   getNextQuestionForPlayer(playerProgress: PlayerProgress): Question | null {
-    if (!this.questions?.length) {
+    // if (!this.questions?.length) {
+    //   return null;
+    // }
+    //
+    // const answeredQuestionIds = new Set(playerProgress.answers.map((a) => a.questionId));
+    //
+    // return this.questions.find((q) => !answeredQuestionIds.has(q.id)) ?? null;
+    const questions = this.getOrderedQuestions();
+
+    if (!questions.length) {
       return null;
     }
 
-    const answeredQuestionIds = new Set(playerProgress.answers.map((a) => a.questionId));
+    const answeredQuestionIds = new Set(
+      playerProgress.answers.map(a => a.questionId),
+    );
 
-    return this.questions.find((q) => !answeredQuestionIds.has(q.id)) ?? null;
+    return questions.find(
+      q => !answeredQuestionIds.has(q.id),
+    ) ?? null;
   }
 
   answerQuestion(playerProgress: PlayerProgress, question: Question, answer: string): PlayerAnswer {
@@ -165,8 +204,8 @@ export class Game {
   private tryFinishGame(): void {
     if (!this.secondPlayerProgress) return;
 
-    const questionsCount = this.questions?.length ?? 0;
-
+    // const questionsCount = this.questions?.length ?? 0;
+    const questionsCount = this.gameQuestions?.length ?? 0;
     const firstFinished = this.firstPlayerProgress.answers.length === questionsCount;
 
     const secondFinished = this.secondPlayerProgress.answers.length === questionsCount;
