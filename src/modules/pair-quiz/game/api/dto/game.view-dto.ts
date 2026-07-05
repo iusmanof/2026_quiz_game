@@ -32,3 +32,27 @@ export class GameViewDto {
   startGameDate: Date | null;
   finishGameDate: Date | null;
 }
+
+
+export class PaginatedGameViewDto<T> {
+  items: T[];
+  totalCount: number;
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+
+  static mapToView<T>(data: {
+    items: T[];
+    page: number;
+    pageSize: number;
+    totalCount: number;
+  }): PaginatedGameViewDto<T> {
+    return {
+      pagesCount: Math.ceil(data.totalCount / data.pageSize),
+      page: data.page,
+      pageSize: data.pageSize,
+      totalCount: data.totalCount,
+      items: data.items,
+    };
+  }
+}

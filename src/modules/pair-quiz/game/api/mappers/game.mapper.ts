@@ -8,7 +8,7 @@ export class GameMapper {
       id: game.id,
 
       firstPlayerProgress: {
-        answers: game.firstPlayerProgress.answers
+        answers:  (game.firstPlayerProgress.answers ?? [])
           .sort((a, b) => a.addedAt.getTime() - b.addedAt.getTime())
           .map((answer) => ({
             questionId: answer.questionId,
@@ -26,7 +26,7 @@ export class GameMapper {
 
       secondPlayerProgress: game.secondPlayerProgress
         ? {
-            answers: game.secondPlayerProgress.answers
+            answers: (game.secondPlayerProgress.answers ?? [])
               .sort((a, b) => a.addedAt.getTime() - b.addedAt.getTime())
               .map((answer) => ({
                 questionId: answer.questionId,

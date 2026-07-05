@@ -41,21 +41,21 @@ describe('Questions e2e', () => {
     });
   });
 
-  // it('POST /quiz/questions with basic auth', async () => {
-  //   const question = await createQuestionHelper(app);
-  //
-  //   const res = await request(app.getHttpServer())
-  //     .get('/sa/quiz/questions')
-  //     .set('Authorization', getBasicAuthHeaderHelper())
-  //     .expect(200);
-  //
-  //   expect(res.body.items).toHaveLength(1);
-  //   expect(res.body.items[0]).toMatchObject({
-  //     body: 'Question',
-  //     correctAnswers: ['answer'],
-  //     published: false,
-  //   });
-  // });
+  it('POST /quiz/questions with basic auth', async () => {
+    const question = await createQuestionHelper(app);
+
+    const res = await request(app.getHttpServer())
+      .get('/sa/quiz/questions')
+      .set('Authorization', getBasicAuthHeaderHelper())
+      .expect(200);
+
+    expect(res.body.items).toHaveLength(1);
+    expect(res.body.items[0]).toMatchObject({
+      body: 'Question',
+      correctAnswers: ['answer'],
+      published: false,
+    });
+  });
 
   it('DELETE /sa/quiz/questions/{id}', async () => {
     const question = await createQuestionHelper(app);

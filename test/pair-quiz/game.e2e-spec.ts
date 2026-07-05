@@ -35,10 +35,6 @@ describe('Game e2e', () => {
     await request(app.getHttpServer()).delete('/testing/all-data').expect(204);
   });
 
-  // beforeEach(async () => {
-  //
-  // });
-
   it('test full logic of game', async () => {
     await createUserHelper(app, {
       login: login1,
@@ -95,6 +91,76 @@ describe('Game e2e', () => {
     expect(
       stat.winsCount + stat.lossesCount + stat.drawsCount,
     ).toBe(1);
+  });
+
+  it('GET /pair-game-quiz/pairs/my - should return all user games (finished + current)', async () => {
+    await createUserHelper(app, {
+      login: 'userA',
+      password: 'password',
+      email: 'userA@mail.com',
+    });
+
+    await createUserHelper(app, {
+      login: 'userB',
+      password: 'password',
+      email: 'userB@mail.com',
+    });
+
+    await createUserHelper(app, {
+      login: 'userC',
+      password: 'password',
+      email: 'userC@mail.com',
+    });
+
+    const tokenA = await loginHelper(app, 'userA', 'password');
+    const tokenB = await loginHelper(app, 'userB', 'password');
+    const tokenC = await loginHelper(app, 'userC', 'password');
+
+    const questions = await createQuestionsHelper(app);
+    await publishQuestionsHelper(app, questions);
+
+    // ======================================================
+    // GAME 1 → A + B (FINISHED)
+    // ======================================================
+    const game1_A = await connectToGameHelper(app, tokenA);
+    await connectToGameHelper(app, tokenB);
+
+    for (let i = 0; i < 5; i++) {
+      await answerHelper(app, tokenA, 'A2');
+      await answerHelper(app, tokenB, 'A2');
+    }
+
+    const finishedGame = await getGameByIdHelper(app, tokenA, game1_A.id);
+    expect(finishedGame.status).toBe('Finished');
+
+    // ======================================================
+    // GAME 2 → A + C (ACTIVE)
+    // ======================================================
+    const game2_A = await connectToGameHelper(app, tokenA);
+    await connectToGameHelper(app, tokenC);
+
+    await answerHelper(app, tokenA, 'A2');
+    await answerHelper(app, tokenC, 'A2');
+
+    // ======================================================
+    // GET MY GAMES (A)
+    // ======================================================
+    const res = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my')
+      .set('Authorization', `Bearer ${tokenA}`)
+      .expect(200);
+
+    expect(res.body.items.length).toBe(2);
+
+    const gameIds = res.body.items.map((g) => g.id);
+
+    expect(gameIds).toContain(game1_A.id);
+    expect(gameIds).toContain(game2_A.id);
+
+    const statuses = res.body.items.map((g) => g.status);
+
+    expect(statuses).toContain('Finished');
+    expect(statuses).toContain('Active');
   });
 
   afterAll(async () => {

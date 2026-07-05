@@ -28,7 +28,6 @@ export class GetPostsForBlogQueryHandler implements IQueryHandler<
     queryParams,
     userId,
   }: GetPostsForBlogQuery): Promise<PostPaginatedViewDto<PostViewDto>> {
-    // TODO getPostsForBlog() слишком большой sql запрос
     const { items, totalCount } = await this.postsQueryRepository.getPostsForBlog(
       blogId,
       queryParams,

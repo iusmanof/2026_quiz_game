@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -22,8 +23,9 @@ import type { AuthenticatedRequest } from '@user-accounts/types/authenticated-re
 import { GameViewDto } from '@modules/pair-quiz/game/api/dto/game.view-dto';
 import { AnswerResponseDto } from '@modules/pair-quiz/game/api/dto/answer-response.dto';
 import { ParseUUIDPipe } from '@nestjs/common';
-import { CurrentUnfinishedUserGameDto } from '@modules/pair-quiz/game/api/dto/current-unfinished-user-game.dto';
 import { IGameStatistic } from '@modules/pair-quiz/game/api/dto/game-statistic.dto';
+import { PaginatedViewDto } from '@core/dto/paginated-view.dto';
+import { GameQueryParamsDto } from '@modules/bloggers-platform/blogs/api/dto/game-query-params.dto';
 
 @Controller('pair-game-quiz')
 class PairGameQuizController {
@@ -38,10 +40,15 @@ class PairGameQuizController {
     return this.queryBus.execute(new GetTopUsersQuery());
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('pairs/my')
   @HttpCode(HttpStatus.OK)
-  async getCurrentGames() {
-    return this.queryBus.execute(new GetCurrentGamesQuery());
+  async getCurrentGames(
+    @Req() req: AuthenticatedRequest,
+    @Query() query: GameQueryParamsDto,
+  ): Promise<PaginatedViewDto<GameViewDto>> {
+    const userId = req.user.id;
+    return this.queryBus.execute(new GetCurrentGamesQuery(userId, query));
   }
 
   @UseGuards(JwtAuthGuard)

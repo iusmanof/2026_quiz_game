@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Game } from '@modules/pair-quiz/game/domain/entites/game.entity';
 import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enum';
+import { GameQueryParamsDto } from '@modules/bloggers-platform/blogs/api/dto/game-query-params.dto';
 
 @Injectable()
 class GameQueryRepository {
@@ -65,6 +66,37 @@ class GameQueryRepository {
         questions: true,
       },
     });
+  }
+  async findGamesByPlayerId(
+    userId: string,
+    queryParams: GameQueryParamsDto,
+  ): Promise<{ items: Game[]; totalCount: number }> {
+    const pageNumber = queryParams.pageNumber ?? 1;
+    const pageSize = queryParams.pageSize ?? 10;
+    const skip = (pageNumber - 1) * pageSize;
+
+    const sortBy = queryParams.sortBy ?? 'pairCreatedDate';
+    const sortDirection = (queryParams.sortDirection ?? 'DESC').toUpperCase() as 'ASC' | 'DESC';
+
+    const qb = this.dataSource
+      .getRepository(Game)
+      .createQueryBuilder('g')
+      .leftJoinAndSelect('g.firstPlayerProgress', 'fpp')
+      .leftJoinAndSelect('fpp.playerAccount', 'fp')
+      .leftJoinAndSelect('g.secondPlayerProgress', 'spp')
+      .leftJoinAndSelect('spp.playerAccount', 'sp')
+      .where('fp.id = :userId OR sp.id = :userId', { userId });
+
+    qb.orderBy(`g.${sortBy}`, sortDirection);
+
+    qb.skip(skip).take(pageSize);
+
+    const [items, totalCount] = await qb.getManyAndCount();
+
+    return {
+      items,
+      totalCount,
+    };
   }
 }
 

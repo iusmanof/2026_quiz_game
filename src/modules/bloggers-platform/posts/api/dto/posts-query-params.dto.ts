@@ -12,3 +12,4 @@ export class PostsQueryParamsDto extends BaseQueryParams {
   @IsOptional()
   sortBy: PostsSortBy = PostsSortBy.CreatedAt;
 }
+
