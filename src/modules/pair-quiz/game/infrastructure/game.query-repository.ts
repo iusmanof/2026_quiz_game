@@ -3,7 +3,11 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Game } from '@modules/pair-quiz/game/domain/entites/game.entity';
 import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enum';
-import { GameQueryParamsDto } from '@modules/bloggers-platform/blogs/api/dto/game-query-params.dto';
+import {
+  GameQueryParamsDto,
+  GameSortBy,
+} from '@modules/bloggers-platform/blogs/api/dto/game-query-params.dto';
+import { SortDirection } from '@core/dto/base.query-params.dto';
 
 @Injectable()
 class GameQueryRepository {
@@ -71,36 +75,44 @@ class GameQueryRepository {
       },
     });
   }
+
   async findGamesByPlayerId(
     userId: string,
     queryParams: GameQueryParamsDto,
   ): Promise<{ items: Game[]; totalCount: number }> {
-    const pageNumber = queryParams.pageNumber ?? 1;
-    const pageSize = queryParams.pageSize ?? 10;
-    const skip = (pageNumber - 1) * pageSize;
-
-    const sortBy = queryParams.sortBy ?? 'pairCreatedDate';
-    const sortDirection = (queryParams.sortDirection ?? 'DESC').toUpperCase() as 'ASC' | 'DESC';
+    const {
+      pageSize = 10,
+      sortBy = GameSortBy.PairCreatedDate,
+      sortDirection = SortDirection.Desc,
+    } = queryParams;
 
     const qb = this.dataSource
       .getRepository(Game)
-      .createQueryBuilder('g')
-      .leftJoinAndSelect('g.firstPlayerProgress', 'fpp')
-      .leftJoinAndSelect('fpp.playerAccount', 'fp')
-      .leftJoinAndSelect('g.secondPlayerProgress', 'spp')
-      .leftJoinAndSelect('spp.playerAccount', 'sp')
-      .where('fp.id = :userId OR sp.id = :userId', { userId });
+      .createQueryBuilder('game')
 
-    qb.orderBy(`g.${sortBy}`, sortDirection);
+      .leftJoinAndSelect('game.firstPlayerProgress', 'firstPlayerProgress')
+      .leftJoinAndSelect('firstPlayerProgress.playerAccount', 'firstPlayerAccount')
+      .leftJoinAndSelect('firstPlayerProgress.answers', 'firstPlayerAnswers')
 
-    qb.skip(skip).take(pageSize);
+      .leftJoinAndSelect('game.secondPlayerProgress', 'secondPlayerProgress')
+      .leftJoinAndSelect('secondPlayerProgress.playerAccount', 'secondPlayerAccount')
+      .leftJoinAndSelect('secondPlayerProgress.answers', 'secondPlayerAnswers')
+
+      .leftJoinAndSelect('game.gameQuestions', 'gameQuestions')
+      .leftJoinAndSelect('gameQuestions.question', 'question')
+
+      .where('firstPlayerAccount.id = :userId', { userId })
+      .orWhere('secondPlayerAccount.id = :userId', { userId });
+
+    if (sortBy !== GameSortBy.PairCreatedDate) {
+      qb.addOrderBy('game.pairCreatedDate', 'DESC');
+    }
+
+    qb.skip(queryParams.calculateSkip()).take(pageSize);
 
     const [items, totalCount] = await qb.getManyAndCount();
 
-    return {
-      items,
-      totalCount,
-    };
+    return { items, totalCount };
   }
 }
 

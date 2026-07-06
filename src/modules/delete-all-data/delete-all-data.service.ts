@@ -23,6 +23,7 @@ export class DeleteAllDataService {
     await this.gameRepository.deleteAllPlayerAnswer();
     await this.gameRepository.deleteAllPlayerProgress();
     await this.gameRepository.deleteAllGames();
+    await this.gameRepository.deleteAllStatistics();
 
     await this.sessionRepository.deleteAll();
     await this.emailConfirmationRepository.deleteAll();

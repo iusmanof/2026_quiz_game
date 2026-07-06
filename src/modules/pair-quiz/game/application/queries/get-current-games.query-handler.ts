@@ -22,6 +22,7 @@ export class GetCurrentGamesQueryHandler implements IQueryHandler<GetCurrentGame
       userId,
       queryParams,
     );
+
     const items = games.map((game) => GameMapper.toView(game));
 
     const page = queryParams.pageNumber ?? 1;

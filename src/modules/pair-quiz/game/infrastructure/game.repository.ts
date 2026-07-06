@@ -5,6 +5,7 @@ import { Game } from '@modules/pair-quiz/game/domain/entites/game.entity';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/entites/player-progress.entity';
 import { PlayerAnswer } from '@modules/pair-quiz/game/domain/entites/player-answer.entity';
 import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enum';
+import { GameStatistic } from '@modules/pair-quiz/game/domain/entites/game-statistic.entity';
 
 @Injectable()
 class GameRepository {
@@ -117,6 +118,10 @@ class GameRepository {
 
   async deleteAllPlayerAnswer() {
     await this.dataSource.createQueryBuilder().delete().from(PlayerAnswer).execute();
+  }
+
+  async deleteAllStatistics() {
+    await this.dataSource.createQueryBuilder().delete().from(GameStatistic).execute();
   }
 }
 
