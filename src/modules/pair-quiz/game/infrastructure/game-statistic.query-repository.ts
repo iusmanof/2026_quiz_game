@@ -13,8 +13,11 @@ class GameStatisticQueryRepository {
   async findByPlayerId(userId: string) {
     return await this.dataSource
       .getRepository(GameStatistic)
-      .findOne({ where: { player: { id: userId } }, relations: { player: true } });
+      .findOne({ where: { player: { id: userId } } });
+  // .findOne({ where: { player: { id: userId } }, relations: { player: true } });
   }
+
+
 }
 
 export default GameStatisticQueryRepository;

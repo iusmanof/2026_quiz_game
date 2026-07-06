@@ -44,9 +44,6 @@ export class Game {
   @JoinColumn()
   secondPlayerProgress: PlayerProgress | null;
 
-  // @ManyToMany(() => Question)
-  // @JoinTable()
-  // questions: Question[] | null;
   @OneToMany(() => GameQuestion, gq => gq.game, {
     cascade: true,
     eager: true,
@@ -98,12 +95,6 @@ export class Game {
     this.startGameDate = new Date();
   }
 
-  // assignQuestions(questions: Question[]): void {
-  //   this.questions = questions;
-  //   console.log('----------assignQuestions-----------');
-  //   console.log(this.questions);
-  //   console.log('----------assignQuestions-----------');
-  // }
 
   assignQuestions(questions: Question[]) {
     this.gameQuestions = questions.map((question, index) => {
@@ -136,13 +127,6 @@ export class Game {
   }
 
   getNextQuestionForPlayer(playerProgress: PlayerProgress): Question | null {
-    // if (!this.questions?.length) {
-    //   return null;
-    // }
-    //
-    // const answeredQuestionIds = new Set(playerProgress.answers.map((a) => a.questionId));
-    //
-    // return this.questions.find((q) => !answeredQuestionIds.has(q.id)) ?? null;
     const questions = this.getOrderedQuestions();
 
     if (!questions.length) {

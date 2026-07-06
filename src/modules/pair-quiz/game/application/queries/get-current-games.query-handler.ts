@@ -22,18 +22,7 @@ export class GetCurrentGamesQueryHandler implements IQueryHandler<GetCurrentGame
       userId,
       queryParams,
     );
-    console.log('______________________________');
-    console.log('data fron DB:');
-    console.log(games);
-    console.log('______________________________');
-
-    // если хочешь стиль как в примере — можно явно маппить отдельно
     const items = games.map((game) => GameMapper.toView(game));
-
-    console.log('+++++++++++++++++++++++++++++++');
-    console.log('After mapper:');
-    console.log(items);
-    console.log('+++++++++++++++++++++++++++++++');
 
     const page = queryParams.pageNumber ?? 1;
     const pageSize = queryParams.pageSize ?? 10;

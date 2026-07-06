@@ -34,9 +34,6 @@ export class ConnectCurrentUserUseCase implements ICommandHandler<ConnectCurrent
 
     if (pendingGame) {
       const questions = await this.questionRepository.getRandomPublishedQuestions(5);
-      console.log('____________PENDING_____________');
-      console.log(questions);
-      console.log('____________PENDING_____________');
       pendingGame.connectSecondPlayer(user);
       pendingGame.assignQuestions(questions);
       await this.gameRepository.save(pendingGame);

@@ -16,7 +16,7 @@ export class GameStatistic {
   @Column({ type: 'int', default: 0 })
   sumScore: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'decimal', precision: 4, scale: 2, default: 0 })
   avgScores: number;
 
   @Column({ type: 'int', default: 0 })

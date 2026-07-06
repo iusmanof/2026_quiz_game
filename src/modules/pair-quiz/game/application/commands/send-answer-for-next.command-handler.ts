@@ -23,9 +23,6 @@ class SendAnswerForNextUseCase implements ICommandHandler<SendAnswerForNextComma
     if (!game) {
       throw new ForbiddenException();
     }
-    console.log('----------------------------');
-    console.log(game);
-    console.log('----------------------------');
 
     const playerProgress = game.getPlayerProgress(command.userId);
     if (!playerProgress) {
@@ -44,14 +41,6 @@ class SendAnswerForNextUseCase implements ICommandHandler<SendAnswerForNextComma
     if (game.status === GameStatus.Finished) {
       this.eventBus.publish(new GameFinishedEvent(game.id));
     }
-
-    console.log('------------GAME____________');
-    console.log(game);
-    console.log('------------GAME____________');
-
-    console.log('++++++++RESULT++++++++++');
-    console.log(result);
-    console.log('++++++++RESULT++++++++++');
 
     return {
       questionId: result.questionId,
