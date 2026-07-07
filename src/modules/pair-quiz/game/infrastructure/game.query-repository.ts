@@ -86,6 +86,7 @@ class GameQueryRepository {
       sortDirection = SortDirection.Desc,
     } = queryParams;
 
+
     const qb = this.dataSource
       .getRepository(Game)
       .createQueryBuilder('game')
@@ -108,7 +109,11 @@ class GameQueryRepository {
       qb.addOrderBy('game.pairCreatedDate', 'DESC');
     }
 
-    qb.skip(queryParams.calculateSkip()).take(pageSize);
+    // DONT DELETE
+    // qb.skip(queryParams.calculateSkip()).take(pageSize);
+    const pageNumber = queryParams.pageNumber ?? 1;
+    const skip = (pageNumber - 1) * pageSize;
+    qb.skip(skip).take(pageSize);
 
     const [items, totalCount] = await qb.getManyAndCount();
 

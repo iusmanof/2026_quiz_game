@@ -12,6 +12,8 @@ import { getCurrentGameHelper } from '../helpers/get-current-game.helper';
 import { getGameByIdHelper } from '../helpers/getGameById.helper';
 import { currentUserStatisticHelper } from '../helpers/current-user-statistic.helper';
 import { beforeEach } from 'node:test';
+import { playGameHelper } from '../helpers/play-game.helper';
+import { getBasicAuthHeaderHelper } from '../helpers/get-basic-auth-header.helper';
 
 describe('Game e2e', () => {
   let app: INestApplication;
@@ -144,7 +146,51 @@ describe('Game e2e', () => {
       .get('/pair-game-quiz/pairs/my')
       .set('Authorization', `Bearer ${tokenA}`)
       .expect(200);
+  });
 
+  it('GET /pair-game-quiz/users/top/ - should return 200 and paginated list of top users', async () => {
+    await createUserHelper(app, {
+      login: 'user123',
+      password: 'password',
+      email: 'user123@m.com',
+    });
+    await createUserHelper(app, {
+      login: 'user124',
+      password: 'password',
+      email: 'user124@m.com',
+    });
+    const token_user123 = await loginHelper(app, 'user123', 'password');
+    const token_user124 = await loginHelper(app, 'user124', 'password');
+
+    const questions = await createQuestionsHelper(app);
+    await publishQuestionsHelper(app, questions);
+
+    // First game
+    const firstGame = await playGameHelper(app, token_user123, token_user124);
+    expect(firstGame.status).toBe('Finished');
+    const secondGame = await playGameHelper(app, token_user123, token_user124, [
+      ['A2', 'A2'],
+      ['A1', 'A3'],
+      ['A4', 'A4'],
+      ['A2', 'A2'],
+      ['A2', 'A1'],
+    ]);
+    expect(secondGame.status).toBe('Finished');
+    const thirdGame = await playGameHelper(app, token_user123, token_user124, [
+      ['A2', 'A4'],
+      ['A1', 'A5'],
+      ['A4', 'A1'],
+      ['A5', 'A2'],
+      ['A3', 'A3'],
+    ]);
+    expect(thirdGame.status).toBe('Finished');
+
+
+    const res = await request(app.getHttpServer())
+      .get('/pair-game-quiz/users/top')
+      .expect(200);
+
+    console.log(res.body);
   });
 
   afterAll(async () => {

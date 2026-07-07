@@ -26,6 +26,7 @@ import { ParseUUIDPipe } from '@nestjs/common';
 import { IGameStatistic } from '@modules/pair-quiz/game/api/dto/game-statistic.dto';
 import { PaginatedViewDto } from '@core/dto/paginated-view.dto';
 import { GameQueryParamsDto } from '@modules/bloggers-platform/blogs/api/dto/game-query-params.dto';
+import { IGameTop } from '@modules/pair-quiz/game/api/dto/game-top.dto';
 
 @Controller('pair-game-quiz')
 class PairGameQuizController {
@@ -36,7 +37,7 @@ class PairGameQuizController {
 
   @Get('users/top')
   @HttpCode(HttpStatus.OK)
-  async getTopUsers() {
+  async getTopUsers(): Promise<PaginatedViewDto<IGameTop>> {
     return this.queryBus.execute(new GetTopUsersQuery());
   }
 
