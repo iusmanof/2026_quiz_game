@@ -14,7 +14,6 @@ export class GameStatisticMapper {
   }
   static toTopUserDto(statistic: GameStatistic) {
     return {
-      id: statistic.id,
       sumScore: statistic.sumScore,
       avgScores: Number(statistic.avgScores),
       gamesCount: statistic.gamesCount,
