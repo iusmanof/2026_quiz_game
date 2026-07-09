@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import GameQueryRepository from '@modules/pair-quiz/game/infrastructure/game.query-repository';
-import { GameQueryParamsDto } from '@modules/bloggers-platform/blogs/api/dto/game-query-params.dto';
+import { GameQueryParamsDto } from '@modules/pair-quiz/game/api/dto/game-query-params.dto';
 import { GameViewDto, PaginatedGameViewDto } from '@modules/pair-quiz/game/api/dto/game.view-dto';
 import { GameMapper } from '@modules/pair-quiz/game/api/mappers/game.mapper';
 

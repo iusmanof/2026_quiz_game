@@ -6,8 +6,9 @@ import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enu
 import {
   GameQueryParamsDto,
   GameSortBy,
-} from '@modules/bloggers-platform/blogs/api/dto/game-query-params.dto';
+} from '@modules/pair-quiz/game/api/dto/game-query-params.dto';
 import { SortDirection } from '@core/dto/base.query-params.dto';
+import { GameTopQueryParamsDto } from '@modules/pair-quiz/game/api/dto/game-top-query-params.dto';
 
 @Injectable()
 class GameQueryRepository {
@@ -108,7 +109,6 @@ class GameQueryRepository {
     if (sortBy !== GameSortBy.PairCreatedDate) {
       qb.addOrderBy('game.pairCreatedDate', 'DESC');
     }
-
     // DONT DELETE
     // qb.skip(queryParams.calculateSkip()).take(pageSize);
     const pageNumber = queryParams.pageNumber ?? 1;

@@ -12,4 +12,20 @@ export class GameStatisticMapper {
       drawsCount: statistic.drawsCount,
     };
   }
+  static toTopUserDto(statistic: GameStatistic) {
+    return {
+      id: statistic.id,
+      sumScore: statistic.sumScore,
+      avgScores: Number(statistic.avgScores),
+      gamesCount: statistic.gamesCount,
+      winsCount: statistic.winsCount,
+      lossesCount: statistic.lossesCount,
+      drawsCount: statistic.drawsCount,
+      player: {
+        id: statistic.player.id,
+        login: statistic.player.login,
+      },
+    };
+  }
+
 }

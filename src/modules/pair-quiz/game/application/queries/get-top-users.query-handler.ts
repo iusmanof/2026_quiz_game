@@ -1,31 +1,24 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { GameTopQueryParamsDto } from '@modules/pair-quiz/game/api/dto/game-top-query-params.dto';
 import GameStatisticQueryRepository from '@modules/pair-quiz/game/infrastructure/game-statistic.query-repository';
+import { GameStatisticMapper } from '@modules/pair-quiz/game/api/mappers/game-statistic.mapper';
 
-export class GetTopUsersQuery {}
+export class GetTopUsersQuery {
+  constructor(public readonly queryParams: GameTopQueryParamsDto) {}
+}
 
 @QueryHandler(GetTopUsersQuery)
 export class GetTopUsersQueryHandler implements IQueryHandler<GetTopUsersQuery> {
   constructor(private readonly gameStatisticQueryRepository: GameStatisticQueryRepository) {}
+
   async execute(query: GetTopUsersQuery) {
+    const result = await this.gameStatisticQueryRepository.findTopUsers(query.queryParams);
+
+    const items = result.items.map((item) => GameStatisticMapper.toTopUserDto(item));
+
     return {
-      pagesCount: 0,
-      page: 0,
-      pageSize: 0,
-      totalCount: 0,
-      items: [
-        {
-          sumScore: 0,
-          avgScores: 0,
-          gamesCount: 0,
-          winsCount: 0,
-          lossesCount: 0,
-          drawsCount: 0,
-          player: {
-            id: 'string',
-            login: 'string',
-          },
-        },
-      ],
+      ...result,
+      items,
     };
   }
 }
