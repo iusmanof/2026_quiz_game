@@ -12,7 +12,6 @@ import { getCurrentGameHelper } from '../helpers/get-current-game.helper';
 import { getGameByIdHelper } from '../helpers/getGameById.helper';
 import { currentUserStatisticHelper } from '../helpers/current-user-statistic.helper';
 import { beforeEach } from 'node:test';
-import { playGameHelper } from '../helpers/play-game.helper';
 import { appSetup } from '../../src/setup/app.setup';
 
 describe('Game e2e', () => {
