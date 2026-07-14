@@ -6,6 +6,8 @@ import { PostsEntity } from '@modules/bloggers-platform/posts/domain/post.entity
 import BlogQueryRepository from '@modules/bloggers-platform/blogs/infrastructure/blogs.query-repository';
 import { CreatePostForBlogDto } from '@modules/bloggers-platform/posts/api/dto/create-post-for-blog.dto';
 import { UpdatePostDto } from '@modules/bloggers-platform/posts/api/dto/update-post.dto';
+import { DomainException, Extension } from '@core/exceptions/filters/domain-exceptions';
+import { DomainExceptionCode } from '@core/exceptions/filters/domain-exception-codes';
 
 @Injectable()
 class PostsRepository {
@@ -85,6 +87,20 @@ class PostsRepository {
   async deleteAll() {
     const query = `DELETE FROM "Posts"`;
     await this.dataSource.query(query);
+  }
+
+  async findOrNotFoundFail(id: string): Promise<PostsEntity | null> {
+    const query = `SELECT * FROM "Posts" WHERE id = $1`;
+    const values = [id];
+    const entity: PostsEntity[] = await this.dataSource.query(query, values);
+    if (!entity.length) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+        extensions: [new Extension('Post with given id does not exist', 'id')],
+      });
+    }
+    return entity[0];
   }
 }
 

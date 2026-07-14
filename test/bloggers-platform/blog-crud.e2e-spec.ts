@@ -32,7 +32,7 @@ describe('Blogs CRUD', () => {
       })
       .expect(201);
 
-    blogId = res.body.id;\
+    blogId = res.body.id;
 
     expect(res.body).toEqual({
       id: expect.any(String),

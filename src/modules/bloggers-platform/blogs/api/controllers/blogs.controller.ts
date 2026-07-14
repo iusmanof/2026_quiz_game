@@ -79,7 +79,8 @@ class BlogsController {
   @Delete(':blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   deletePostForBlog(@Param('blogId') blogId: string, @Param('postId') postId: string) {
-    return this.commandBus.execute(new DeletePostCommand(blogId, postId));
+    // TODO check blogId
+    return this.commandBus.execute(new DeletePostCommand(postId));
   }
 }
 
