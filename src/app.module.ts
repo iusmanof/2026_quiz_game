@@ -6,10 +6,12 @@ import { BloggersPlatformModule } from '@modules/bloggers-platform/bloggers-plat
 import { PostgresqlDatabaseModule } from '@core/database/postgresql-database.module';
 import { DeleteAllDataModule } from '@modules/delete-all-data/delete-all-data.module';
 import { PairQuizModule } from '@modules/pair-quiz/pair-quiz.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     configModule,
+    ScheduleModule.forRoot(),
     PostgresqlDatabaseModule,
     UserAccountsModule,
     BloggersPlatformModule,

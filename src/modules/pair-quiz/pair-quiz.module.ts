@@ -29,6 +29,7 @@ import { GameFinishedEventHandler } from '@modules/pair-quiz/game/application/ev
 import GameStatisticRepository from '@modules/pair-quiz/game/infrastructure/game-statistic.repository';
 import GameStatisticQueryRepository from '@modules/pair-quiz/game/infrastructure/game-statistic.query-repository';
 import { GameQuestion } from '@modules/pair-quiz/game/domain/entites/game-question.entity';
+import { GameTimeoutService } from '@modules/pair-quiz/game/application/sevice/game-timeout.service';
 
 const controllers = [PairGameQuizController, QuestionsController];
 const repositories = [
@@ -56,13 +57,20 @@ const handlers = [
   GetAllQuestionsQueryHandler,
   GameFinishedEventHandler,
 ];
-const services = [];
+const services = [GameTimeoutService];
 const exportsRepo = [QuestionRepository, GameRepository];
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([PlayerProgress, Game, Question, PlayerAnswer, GameStatistic, GameQuestion]),
+    TypeOrmModule.forFeature([
+      PlayerProgress,
+      Game,
+      Question,
+      PlayerAnswer,
+      GameStatistic,
+      GameQuestion,
+    ]),
     UserAccountsModule,
   ],
   controllers: [...controllers],

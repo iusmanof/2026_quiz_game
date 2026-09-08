@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, IsNull, Not } from 'typeorm';
 import { Game } from '@modules/pair-quiz/game/domain/entites/game.entity';
 import { PlayerProgress } from '@modules/pair-quiz/game/domain/entites/player-progress.entity';
 import { PlayerAnswer } from '@modules/pair-quiz/game/domain/entites/player-answer.entity';
@@ -102,6 +102,26 @@ class GameRepository {
     });
 
     return this.sortAnswers(game);
+  }
+
+  async findGamesWaitingForTimeout(): Promise<Game[]> {
+    return this.dataSource.getRepository(Game).find({
+      where: {
+        status: GameStatus.Active,
+        firstPlayerFinishedAt: Not(IsNull()),
+      },
+      relations: {
+        firstPlayerProgress: {
+          answers: true,
+        },
+        secondPlayerProgress: {
+          answers: true,
+        },
+        gameQuestions: {
+          question: true,
+        },
+      },
+    });
   }
 
   async save(game: Game): Promise<Game> {

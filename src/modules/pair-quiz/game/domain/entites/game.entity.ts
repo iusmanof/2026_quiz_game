@@ -18,6 +18,8 @@ import { GameStatus } from '@modules/pair-quiz/game/domain/enums/game-status.enu
 import { GameResult } from '@modules/pair-quiz/game/domain/enums/game-result.enum';
 import { GameQuestion } from '@modules/pair-quiz/game/domain/entites/game-question.entity';
 
+const questionsCount = 5;
+
 @Entity('Game')
 export class Game {
   @PrimaryGeneratedColumn('uuid')
@@ -44,7 +46,7 @@ export class Game {
   @JoinColumn()
   secondPlayerProgress: PlayerProgress | null;
 
-  @OneToMany(() => GameQuestion, gq => gq.game, {
+  @OneToMany(() => GameQuestion, (gq) => gq.game, {
     cascade: true,
     eager: true,
   })
@@ -61,6 +63,9 @@ export class Game {
 
   @Column({ type: 'timestamp', nullable: true })
   finishGameDate: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  firstPlayerFinishedAt: Date | null;
 
   static createPendingGame(user: User): Game {
     const game = new Game();
@@ -95,7 +100,6 @@ export class Game {
     this.startGameDate = new Date();
   }
 
-
   assignQuestions(questions: Question[]) {
     this.gameQuestions = questions.map((question, index) => {
       const gq = new GameQuestion();
@@ -109,9 +113,7 @@ export class Game {
   }
 
   private getOrderedQuestions(): Question[] {
-    return (this.gameQuestions ?? [])
-      .sort((a, b) => a.order - b.order)
-      .map(gq => gq.question);
+    return (this.gameQuestions ?? []).sort((a, b) => a.order - b.order).map((gq) => gq.question);
   }
 
   getPlayerProgress(userId: string): PlayerProgress | null {
@@ -133,13 +135,9 @@ export class Game {
       return null;
     }
 
-    const answeredQuestionIds = new Set(
-      playerProgress.answers.map(a => a.questionId),
-    );
+    const answeredQuestionIds = new Set(playerProgress.answers.map((a) => a.questionId));
 
-    return questions.find(
-      q => !answeredQuestionIds.has(q.id),
-    ) ?? null;
+    return questions.find((q) => !answeredQuestionIds.has(q.id)) ?? null;
   }
 
   answerQuestion(playerProgress: PlayerProgress, question: Question, answer: string): PlayerAnswer {
@@ -154,6 +152,12 @@ export class Game {
     playerAnswer.addedAt = new Date();
 
     playerProgress.answers.push(playerAnswer);
+
+    if (!this.firstPlayerFinishedAt && playerProgress.answers.length === questionsCount) {
+      this.firstPlayerFinishedAt = new Date();
+    }
+
+    // ???
 
     if (isCorrect) {
       playerProgress.score += 1;
@@ -220,5 +224,40 @@ export class Game {
     }
     this.status = GameStatus.Finished;
     this.finishGameDate = new Date();
+  }
+  finishByTimeout(): void {
+    if (!this.secondPlayerProgress) {
+      return;
+    }
+
+    const questionsCount = this.gameQuestions.length;
+
+    const firstFinished = this.firstPlayerProgress.answers.length === questionsCount;
+
+    const secondFinished = this.secondPlayerProgress.answers.length === questionsCount;
+
+    if (firstFinished && secondFinished) {
+      return;
+    }
+
+    const playerToComplete = firstFinished ? this.secondPlayerProgress : this.firstPlayerProgress;
+
+    const answeredIds = new Set(playerToComplete.answers.map((a) => a.questionId));
+
+    for (const question of this.getOrderedQuestions()) {
+      if (answeredIds.has(question.id)) {
+        continue;
+      }
+
+      const answer = new PlayerAnswer();
+
+      answer.questionId = question.id;
+      answer.answerStatus = AnswerStatus.Incorrect;
+      answer.addedAt = new Date();
+
+      playerToComplete.answers.push(answer);
+    }
+
+    this.tryFinishGame();
   }
 }

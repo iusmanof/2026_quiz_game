@@ -34,7 +34,9 @@ class PairGameQuizController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) {}
+  ) {
+    console.log('🔥🔥🔥 PAIR GAME CONTROLLER LOADED');
+  }
 
   @Get('users/top')
   @HttpCode(HttpStatus.OK)

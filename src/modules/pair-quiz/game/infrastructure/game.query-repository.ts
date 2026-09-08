@@ -8,7 +8,6 @@ import {
   GameSortBy,
 } from '@modules/pair-quiz/game/api/dto/game-query-params.dto';
 import { SortDirection } from '@core/dto/base.query-params.dto';
-import { GameTopQueryParamsDto } from '@modules/pair-quiz/game/api/dto/game-top-query-params.dto';
 
 @Injectable()
 class GameQueryRepository {
